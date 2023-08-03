@@ -30,6 +30,7 @@ package :
 			git ls-tree --full-tree --name-only -r @ src \
 				| xargs tar -rvf $(archive).tar --transform 's#^src/#$(NAME)/#'; \
 		} \
+		&& tar -rvf $(archive).tar --transform 's#^#bmakelib/#' LICENSE \
 		&& gzip -c $(archive).tar > $(archive).tar.gz \
 		&& echo $(archive).tar.gz created.
 

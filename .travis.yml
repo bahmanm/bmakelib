@@ -1,1 +1,12 @@
+---
 language: minimal
+os: linux
+
+jobs:
+  include:
+    - name: bionic (18.04)
+      dist: bionic
+    - name: focal (20.04)
+      dist: focal
+    - name: jammy (22.04)
+      dist: jammy

@@ -1,5 +1,7 @@
 SHELL := /usr/bin/env bash -e -o pipefail
 
+.DEFAULT_GOAL := test
+
 ####################################################################################################
 
 ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))

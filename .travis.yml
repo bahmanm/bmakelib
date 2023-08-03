@@ -1,0 +1,10 @@
+---
+language: minimal
+os: linux
+
+jobs:
+  include:
+    - name: focal (20.04)
+      dist: focal
+    - name: jammy (22.04)
+      dist: jammy

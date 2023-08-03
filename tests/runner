@@ -19,7 +19,7 @@ fi
 
 root_dir=${RUNNER_ROOT}
 if [[ -z "$root_dir" ]]; then
-  echo.error 'runner: No blibmake root directory sepcified - set the value of RUNNER_ROOT.'
+  echo.error 'runner: No bmakelib root directory sepcified - set the value of RUNNER_ROOT.'
   exit 1
 fi
 

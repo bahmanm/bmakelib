@@ -24,51 +24,7 @@ if [[ -z "$root_dir" ]]; then
 fi
 
 ####################################################################################################
-# echo.error MSG
-####################################################################################################
-function echo.error {
-  echo "$@" >&2
-}
-
-####################################################################################################
-# pushd DIR
-####################################################################################################
-function pushd {
-  command pushd "$@" > /dev/null
-}
-
-####################################################################################################
-# popd DIR
-####################################################################################################
-function popd {
-  command popd "$@" > /dev/null
-}
-
-####################################################################################################
-# run_a_test TEST
-#
-# Globals:
-#   target_dir
-####################################################################################################
-function run_a_test {
-  local test_file="${root_dir}${1}"
-  local test_name="$(basename $test_file)"
-  local test_dir="${target_dir}/${test_name}"
-
-  echo "Running ${test_name} in ${test_dir}..."
-  mkdir -p $test_dir || echo.error "runner: Could not create ${test_dir}."
-  cp $test_file $test_dir || echo.error  "runner: Could not find ${test_file}."
-  pushd $test_dir
-  if ! ./${test_name}; then
-    echo.error "ERROR: ${test_name} failed."
-    popd
-    return 1
-  fi
-  popd
-}
-
-####################################################################################################
-# run_all_tests
+# run_all_test_suites
 #
 # Globals:
 #   tests_to_run
@@ -76,20 +32,27 @@ function run_a_test {
 # Output:
 #   PASSED_TEST_COUNT FAILED_TEST_COUNT
 ####################################################################################################
-function run_all_tests {
+function run_all_test_suites {
   local failed_count=0
   local ok_count=0
+
+  echo
   for t in $tests_to_run; do
-    if run_a_test $t; then
+    if run_a_test_suite $t; then
       ok_count=$(( $ok_count + 1 ))
     else
       failed_count=$(( $failed_count + 1 ))
     fi
+    echo
   done
 
+  echo
   echo "✅ $ok_count test(s) passed."
   echo "❌ $failed_count test(s) failed."
   [[ $failed_count -eq 0 ]] || return 1
 }
 
-run_all_tests
+####################################################################################################
+
+source ${root_dir}tests/runner_lib.sh
+run_all_test_suites

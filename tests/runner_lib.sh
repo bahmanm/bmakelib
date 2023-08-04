@@ -42,6 +42,8 @@ function run_a_test_suite {
     popd
     perl -E 'say "<" x 80'
     return 1
+  else
+    echo.error "runner: 🟢 ${test_name} passed."
   fi
   popd
 

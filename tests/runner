@@ -18,25 +18,7 @@
 set -o errexit
 set -o pipefail
 
-# list of absolute paths
-tests_to_run=${RUNNER_TESTS}
-if [[ -z "$tests_to_run" ]]; then
-  bmakelib.test.echo.error 'runner: No tests to run specificed - set the value of RUNNER_TESTS.'
-  exit 1
-fi
-
-# absolute path
-export target_dir=${RUNNER_DIR}
-if [[ -z "$target_dir" ]]; then
-  bmakelib.test.echo.error 'runner: No target (temp) directory sepcified - set the value of RUNNER_DIR.'
-  exit 1
-fi
-
-export root_dir=${RUNNER_ROOT}
-if [[ -z "$root_dir" ]]; then
-  bmakelib.test.echo.error 'runner: No bmakelib root directory sepcified - set the value of RUNNER_ROOT.'
-  exit 1
-fi
+source ${root_dir}tests/lib.sh
 
 ####################################################################################################
 # run_all_test_suites
@@ -67,7 +49,24 @@ function run_all_test_suites {
   [[ $failed_count -eq 0 ]] || return 1
 }
 
-####################################################################################################
+# list of absolute paths
+tests_to_run=${RUNNER_TESTS}
+if [[ -z "$tests_to_run" ]]; then
+  bmakelib.test.echo.error 'runner: No tests to run specificed - set the value of RUNNER_TESTS.'
+  exit 1
+fi
 
-source ${root_dir}tests/lib.sh
+# absolute path
+export target_dir=${RUNNER_DIR}
+if [[ -z "$target_dir" ]]; then
+  bmakelib.test.echo.error 'runner: No target (temp) directory sepcified - set the value of RUNNER_DIR.'
+  exit 1
+fi
+
+export root_dir=${RUNNER_ROOT}
+if [[ -z "$root_dir" ]]; then
+  bmakelib.test.echo.error 'runner: No bmakelib root directory sepcified - set the value of RUNNER_ROOT.'
+  exit 1
+fi
+
 run_all_test_suites

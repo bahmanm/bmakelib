@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © 2023 Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# when a variable is blank, it should use the provided default
+####################################################################################################
+
+function use_default_when_blank {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+include ${root_dir}/src/default-if-blank.Makefile
+
+.PHONY : echo-var1
+
+echo-var1 : bmakelib.default-if-blank( VAR1,v1 )
+echo-var1 :
+	echo \$(VAR1)
+EOF
+
+  make echo-var1 > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+echo v1
+v1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# when a variable is not blank, ignore the default value provided
+####################################################################################################
+
+function ignore_default_when_nonblank {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+include ${root_dir}/src/default-if-blank.Makefile
+
+.PHONY : echo-var1
+
+VAR1 = 100
+echo-var1 : bmakelib.default-if-blank( VAR1,v1 )
+echo-var1 :
+	@echo \$(VAR1)
+EOF
+
+  make echo-var1 > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+100
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# process multiple variable,value pairs separated by whitespace.
+####################################################################################################
+
+function multiple_variable_value_pairs {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+include ${root_dir}/src/default-if-blank.Makefile
+
+.PHONY : echo-vars
+
+echo-vars : VAR1 := 100
+echo-vars : bmakelib.default-if-blank( VAR1,v1 VAR2,v2 VAR3,v3 )
+echo-vars :
+	@echo \$(VAR1), \$(VAR2), \$(VAR3)
+EOF
+
+  make VAR2=200 echo-vars > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+100, 200, v3
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# emit an info message when bmakelib.conf.default-if-blank.SILENT is not yes
+####################################################################################################
+
+function emit_info_when_not_SILENT {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+include ${root_dir}/src/default-if-blank.Makefile
+
+.PHONY : echo-vars
+
+echo-vars : bmakelib.conf.default-if-blank.SILENT := no
+echo-vars : VAR2 := 200
+echo-vars : VAR4 := 400
+echo-vars : bmakelib.default-if-blank( VAR1,v1 VAR2,v2 VAR3,v3 VAR4,v4 )
+echo-vars :
+	@echo \$(VAR1), \$(VAR2), \$(VAR3), \$(VAR4)
+EOF
+
+  make echo-vars > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Using default value 'v1' for variable 'VAR1'
+Using default value 'v3' for variable 'VAR3'
+v1, 200, v3, 400
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+
+test_cases=( use_default_when_blank \
+               ignore_default_when_nonblank \
+               multiple_variable_value_pairs \
+               emit_info_when_not_SILENT )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in "${test_cases[@]}"; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

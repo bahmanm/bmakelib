@@ -9,4 +9,4 @@ jobs:
     - name: jammy (22.04)
       dist: jammy
 
-script: make test
+script: make tell-make-version test

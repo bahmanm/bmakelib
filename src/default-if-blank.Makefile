@@ -68,8 +68,6 @@
 
 .PHONY : bmakelib.default-if-blank(%)
 
-
-bmakelib.default-if-blank(%) : bmakelib.conf.default-if-blank.SILENT ?= yes
 bmakelib.default-if-blank(%) :
 	$(let _varname _varval _rest, \
 		$(subst $(bmakelib.comma), ,$(*)), \
@@ -81,9 +79,19 @@ bmakelib.default-if-blank(%) :
 			$(eval $(_varname) := $(_varval))))
 
 ####################################################################################################
-# Expands to a single , (COMMA) character.
+#    Expands to a single , (COMMA) character.
 ####################################################################################################
 
 define bmakelib.comma
 ,
 endef
+
+####################################################################################################
+#    Controls wether bmakelib.default-if-blank should emit an info message when using the default
+#    provided.
+#
+#    Default is "yes" which means do NOT emit.
+#    Set to "no" to make it behave otherwise.
+####################################################################################################
+
+bmakelib.conf.default-if-blank.SILENT ?= yes

@@ -122,9 +122,9 @@ function make_version {
 .PHONY : tell-make-version
 
 tell-make-version :
-	@echo Make binary: "$(MAKE)" "$(MAKEFLATS)"
-	@echo Make faetures enabled: "$(.FEATURES)"
-	@echo Make version: "$(MAKE_VERSION)"
+	@echo Make binary: "\$(MAKE)" "\$(MAKEFLATS)"
+	@echo Make faetures enabled: "\$(.FEATURES)"
+	@echo Make version: "\$(MAKE_VERSION)"
 EOF
 
   make VAR1=v1 VAR2=v2 VAR3=v3 echo-vars > $actual_value_filename 2>&1

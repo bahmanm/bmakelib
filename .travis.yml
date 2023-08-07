@@ -39,5 +39,5 @@ jobs:
       before_install: brew update
       install: brew install make git bash
       script: >-
-        PATH="$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH"
+        PATH=$(echo "$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH")
         make tell-make-version test

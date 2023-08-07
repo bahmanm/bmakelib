@@ -18,13 +18,4 @@ jobs:
       osx_image: xcode12
       before_install: brew update
       install: brew install make git bash
-      script: gmake test
-
-  exclude:
-    - name: xenial (16.04)
-      os: linux
-      dist: xenial
-
-    - name: osx xcode9.4
-      os: osx
-      osx_image: xcode4.4
+      script: PATH="$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH" gmake test

@@ -68,7 +68,7 @@ test :
 .PHONY : _tell-make-features
 
 _tell-make-features :
-	@echo Make faetures enabled: "$(.FEATURES)"
+	@echo Make features enabled: "$(.FEATURES)"
 
 ####################################################################################################
 

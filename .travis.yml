@@ -15,8 +15,7 @@ jobs:
         && sudo make install
         && popd
       script: >-
-        PATH="/usr/local/bin:$PATH"
-        make tell-make-version test
+        PATH="/usr/local/bin:$PATH" make test
 
     - name: jammy (22.04)
       os: linux
@@ -30,14 +29,13 @@ jobs:
         && sudo make install
         && popd
       script: >-
-        PATH="/usr/local/bin:$PATH"
-        make tell-make-version test
+        PATH="/usr/local/bin:$PATH" make test
 
     - name: osx xcode12
       os: osx
       osx_image: xcode12
       before_install: brew update
-      install: brew install make git bash
+      install: >-
+        brew install make git bash
       script: >-
-        PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-        make tell-make-version test
+        PATH="/usr/local/opt/make/libexec/gnubin:$PATH" make test

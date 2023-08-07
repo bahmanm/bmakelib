@@ -112,43 +112,13 @@ EOF
 }
 
 ####################################################################################################
-# test make version
-####################################################################################################
-
-function make_version {
-  local test_case_name=${FUNCNAME[0]}
-  local actual_value_filename=${test_case_name}.actual.log
-  bmakelib.test.cat <<EOF > Makefile
-.PHONY : tell-make-version
-
-tell-make-version :
-	@bash --version
-	@echo \$\$PATH
-	@echo Make binary: "\$(MAKE)" "\$(MAKEFLAGS)"
-	@echo Make faetures enabled: "\$(.FEATURES)"
-	@echo Make version: "\$(MAKE_VERSION)"
-EOF
-
-  make VAR1=v1 VAR2=v2 VAR3=v3 tell-make-version > $actual_value_filename 2>&1
-
-  local expected_pattern_filename=${test_case_name}.expected.pattern
-  bmakelib.test.cat <<EOF > $expected_pattern_filename
-IT SHOULD FAIL SO THAT THE OUTPUT IS VISIBLE IN THE PIPELINE
-EOF
-
-  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
-    || return 1
-}
-
-####################################################################################################
 
 perl -E 'say ">" x 40'
 echo "${test_suite_name}: running ${test_case_name}..."
 
 test_cases=( single_var_exit_when_blank \
                multi_var_exist_on_first_nonblank \
-               ok_all_nonblank_vars \
-               make_version )
+               ok_all_nonblank_vars )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

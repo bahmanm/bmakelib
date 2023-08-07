@@ -1,8 +1,5 @@
 ---
 language: minimal
-os:
-  - linux
-  - osx
 
 jobs:
   include:

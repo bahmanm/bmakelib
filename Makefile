@@ -59,8 +59,7 @@ clean :
 .PHONY : test
 
 test : tests.dir := $(shell mktemp -d)
-#test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
-test : tests.all := $(shell find tests/* -type f \( -name 'test_*' $$(cat .gitignore | xargs -I{} echo "! -name '{}' ") \))
+test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
 test :
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
 

@@ -127,7 +127,7 @@ tell-make-version :
 	@echo Make version: "\$(MAKE_VERSION)"
 EOF
 
-  make VAR1=v1 VAR2=v2 VAR3=v3 echo-vars > $actual_value_filename 2>&1
+  make VAR1=v1 VAR2=v2 VAR3=v3 tell-make-version > $actual_value_filename 2>&1
 
   local expected_pattern_filename=${test_case_name}.expected.pattern
   bmakelib.test.cat <<EOF > $expected_pattern_filename

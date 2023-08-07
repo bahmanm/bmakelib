@@ -62,32 +62,3 @@ test : tests.dir := $(shell mktemp -d)
 test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
 test :
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
-
-####################################################################################################
-
-.PHONY : _tell-make-features
-
-_tell-make-features :
-	@echo Make faetures enabled: "$(.FEATURES)"
-
-####################################################################################################
-
-.PHONY : _tell-make-version
-
-_tell-make-version :
-	@echo Make version: "$(MAKE_VERSION)"
-
-####################################################################################################
-
-.PHONY : tell-make-version
-
-tell-make-version : _tell-make-version _tell-make-features
-
-####################################################################################################
-
-.PHONY : test-in-containers
-
-test-in-containers : image.2204 := bmakelib-tests-ubuntu-22-04:latest
-test-in-containers :
-	@docker build -t $(image.2204) - < $(ROOT)tests/ubuntu-22.04.Dockerfile
-	@docker run -v $(ROOT):/bmakelib --rm $(image.2204)

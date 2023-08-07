@@ -59,7 +59,8 @@ clean :
 .PHONY : test
 
 test : tests.dir := $(shell mktemp -d)
-test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
+#test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
+test : tests.all := $(shell find tests/* -type f \( -name 'test_*' $$(cat .gitignore | xargs -I{} echo "! -name '{}' ") \))
 test :
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
 
@@ -82,3 +83,12 @@ _tell-make-version :
 .PHONY : tell-make-version
 
 tell-make-version : _tell-make-version _tell-make-features
+
+####################################################################################################
+
+.PHONY : test-in-containers
+
+test-in-containers : image.2204 := bmakelib-tests-ubuntu-22-04:latest
+test-in-containers :
+	@docker build -t $(image.2204) - < $(ROOT)tests/ubuntu-22.04.Dockerfile
+	@docker run -v $(ROOT):/bmakelib --rm $(image.2204)

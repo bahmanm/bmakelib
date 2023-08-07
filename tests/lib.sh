@@ -76,7 +76,7 @@ function bmakelib.test.run_test_suite {
   bmakelib.test.pushd $test_dir
   if ! ./${test_suite_name}; then
     bmakelib.test.echo.error "runner: 🔴 ${test_suite_name} failed."
-    popd
+    bmakelib.test.popd
     perl -E 'say "<" x 80'
     return 1
   else

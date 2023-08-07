@@ -31,7 +31,10 @@ jobs:
       script: >-
         PATH="/usr/local/bin:$PATH" make test
 
+    # Only run for the main branch.
+    # Travis OSX jobs are 5x more expensive than Linux ones.
     - name: osx xcode12
+      if: branch = main
       os: osx
       osx_image: xcode12
       before_install: brew update

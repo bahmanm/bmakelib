@@ -1,12 +1,44 @@
 ---
 language: minimal
-os: linux
 
 jobs:
   include:
     - name: focal (20.04)
+      os: linux
       dist: focal
-    - name: jammy (22.04)
-      dist: jammy
+      install: >-
+        pushd /tmp
+        && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+        && tar xzf make-4.4.1.tar.gz
+        && cd make-4.4.1
+        && ./configure --prefix=/usr/local
+        && sudo make install
+        && popd
+      script: >-
+        PATH="/usr/local/bin:$PATH" make test
 
-script: make test
+    - name: jammy (22.04)
+      os: linux
+      dist: jammy
+      install: >-
+        pushd /tmp
+        && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+        && tar xzf make-4.4.1.tar.gz
+        && cd make-4.4.1
+        && ./configure --prefix=/usr/local
+        && sudo make install
+        && popd
+      script: >-
+        PATH="/usr/local/bin:$PATH" make test
+
+    # Only run for the main branch.
+    # Travis OSX jobs are 5x more expensive than Linux ones.
+    - name: osx xcode12
+      if: branch = main
+      os: osx
+      osx_image: xcode12
+      before_install: brew update
+      install: >-
+        brew install make git bash
+      script: >-
+        PATH="/usr/local/opt/make/libexec/gnubin:$PATH" make test

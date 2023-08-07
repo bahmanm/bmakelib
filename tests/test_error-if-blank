@@ -116,9 +116,9 @@ EOF
 perl -E 'say ">" x 40'
 echo "${test_suite_name}: running ${test_case_name}..."
 
-test_cases=(single_var_exit_when_blank \
-              multi_var_exist_on_first_nonblank \
-              ok_all_nonblank_vars)
+test_cases=( single_var_exit_when_blank \
+               multi_var_exist_on_first_nonblank \
+               ok_all_nonblank_vars )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

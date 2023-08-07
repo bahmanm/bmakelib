@@ -14,7 +14,9 @@ jobs:
         && ./configure --prefix=/usr/local
         && sudo make install
         && popd
-      script: PATH="/usr/local/bin:$PATH" make test
+      script: >-
+        PATH="/usr/local/bin:$PATH"
+        make tell-make-version test
 
     - name: jammy (22.04)
       os: linux
@@ -27,11 +29,15 @@ jobs:
         && ./configure --prefix=/usr/local
         && sudo make install
         && popd
-      script: PATH="/usr/local/bin:$PATH" make test
+      script: >-
+        PATH="/usr/local/bin:$PATH"
+        make tell-make-version test
 
     - name: osx xcode12
       os: osx
       osx_image: xcode12
       before_install: brew update
       install: brew install make git
-      script: PATH="$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH" make test
+      script: >-
+        PATH="$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH"
+        make tell-make-version test

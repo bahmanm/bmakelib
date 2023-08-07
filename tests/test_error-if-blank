@@ -122,7 +122,7 @@ function make_version {
 .PHONY : tell-make-version
 
 tell-make-version :
-	@echo Make binary: "\$(MAKE)" "\$(MAKEFLATS)"
+	@echo Make binary: "\$(MAKE)" "\$(MAKEFLAGS)"
 	@echo Make faetures enabled: "\$(.FEATURES)"
 	@echo Make version: "\$(MAKE_VERSION)"
 EOF

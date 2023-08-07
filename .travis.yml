@@ -37,7 +37,7 @@ jobs:
       os: osx
       osx_image: xcode12
       before_install: brew update
-      install: brew install make git
+      install: brew install make git bash
       script: >-
         PATH="$HOMEBREW_PREFIX/opt/make/libexec/gnubin:$PATH"
         make tell-make-version test

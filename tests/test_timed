@@ -21,28 +21,28 @@ test_suite_name=$(basename $BASH_SOURCE)
 source ${root_dir}tests/lib.sh
 
 ####################################################################################################
-# when a variable is blank, make should exit with an error
+# emit an info with time the given target took to execute when timed is an implicit prerequisite.
 ####################################################################################################
 
-function single_var_exit_when_blank {
+function ok_emit_info_with_duration_implicit_prerequisite {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
 include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 
-.PHONY : echo-var1
+.PHONY : some-target
 
-echo-var1 : bmakelib.error-if-blank( VAR1 )
-echo-var1 :
-	echo \$(VAR1)
+some-target :
+	@echo Running some-target with implicit timed prereq...
 EOF
 
-  make echo-var1 > $actual_value_filename 2>&1
+  make some-target!timed > $actual_value_filename 2>&1
 
   local expected_pattern_filename=${test_case_name}.expected.pattern
   bmakelib.test.cat <<EOF > $expected_pattern_filename
 make.+Entering.+
-.+\*\*\*\s+Provide a value for 'VAR1'.\s+Stop.
+Running some-target with implicit timed prereq...
+Target 'some-target' took (?<duration>\d+)ms to complete.
 make.+Leaving.+
 EOF
 
@@ -51,28 +51,32 @@ EOF
 }
 
 ####################################################################################################
-# given more than one variable, it should exit on the first blank one
+# emit an info with time the given target took to execute when timed is an explicit prerequisite.
 ####################################################################################################
 
-function multi_var_exist_on_first_nonblank {
+function ok_emit_info_with_duration_explicit_prerequisite {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
 include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 
-.PHONY : echo-vars
+.PHONY : do-some-target
 
-echo-vars : bmakelib.error-if-blank( VAR1 VAR2 VAR3 )
-echo-vars :
-	echo \$(VAR1) \$(VAR2) \$(VAR3)
+do-some-target :
+	@echo Running do-some-target with explicit timed prereq...
+
+.PHONY : some-target
+
+some-target : do-some-target!timed
 EOF
 
-  make VAR1=var1-value echo-vars > $actual_value_filename 2>&1
+  make some-target > $actual_value_filename 2>&1
 
   local expected_pattern_filename=${test_case_name}.expected.pattern
   bmakelib.test.cat <<EOF > $expected_pattern_filename
 make.+Entering.+
-.+\*\*\*\s+Provide a value for 'VAR2'.\s+Stop.
+Running do-some-target with explicit timed prereq...
+Target 'do-some-target' took (?<duration>\d+)ms to complete.
 make.+Leaving.+
 EOF
 
@@ -81,29 +85,59 @@ EOF
 }
 
 ####################################################################################################
-# ok when all the variables are non-blank
+# do not emit any additional output if SILENT is set
 ####################################################################################################
 
-function ok_all_nonblank_vars {
+function ok_no_additional_output_if_silent {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
 include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 
-.PHONY : echo-vars
+.PHONY : some-target
 
-echo-vars : bmakelib.error-if-blank( VAR1 VAR2 )
-echo-vars : bmakelib.error-if-blank( VAR3 )
-echo-vars :
-	@echo \$(VAR1) \$(VAR2) \$(VAR3)
+some-target :
+	@echo Running some-target...
 EOF
 
-  make VAR1=v1 VAR2=v2 VAR3=v3 echo-vars > $actual_value_filename 2>&1
+  make bmakelib.conf.timed.SILENT=yes some-target!timed > $actual_value_filename 2>&1
 
   local expected_pattern_filename=${test_case_name}.expected.pattern
   bmakelib.test.cat <<EOF > $expected_pattern_filename
 make.+Entering.+
-v1 v2 v3
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# emit an info with time the given target took to execute when timed is an implicit prerequisite.
+####################################################################################################
+
+function ok_emit_info_when_convenience_target_is_disabled {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+bmakelib.conf.timed.convenience-target := no
+
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit timed prereq...
+EOF
+
+  make some-target!bmakelib.timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target with implicit timed prereq...
+Target 'some-target' took (?<duration>\d+)ms to complete.
 make.+Leaving.+
 EOF
 
@@ -113,9 +147,10 @@ EOF
 
 ####################################################################################################
 
-test_cases=( single_var_exit_when_blank \
-               multi_var_exist_on_first_nonblank \
-               ok_all_nonblank_vars )
+test_cases=( ok_emit_info_with_duration_implicit_prerequisite \
+               ok_emit_info_with_duration_explicit_prerequisite \
+               ok_no_additional_output_if_silent \
+               ok_emit_info_when_convenience_target_is_disabled )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

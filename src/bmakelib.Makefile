@@ -14,14 +14,14 @@
 ####################################################################################################
 
 ####################################################################################################
-# Minimum Make version supported.
-# Anything older either breaks bmakelib or can cause it to behave in unexpected ways.
+#   Minimum Make version supported.
+#   Anything older either breaks bmakelib or can cause it to behave in unexpected ways.
 ####################################################################################################
 
 bmakelib.MIN_MAKE_VERSION := 4.4
 
 ####################################################################################################
-# Abort with a, hopefully, informative message if it's an unsupported Make version.
+#   Abort with, hopefully, an informative message if it's an unsupported Make version.
 ####################################################################################################
 
 ifeq ($(shell perl -E 'print $$1 if "$(MAKE_VERSION)" =~ /^\s*(\d+(\.\d+)?)/ && $$1 >= $(bmakelib.MIN_MAKE_VERSION)'),)
@@ -60,10 +60,11 @@ $(bmakelib.octospace)&& sudo make install$(bmakelib.newline)$(bmakelib.newline))
 endif
 
 ####################################################################################################
-# If it's a supported Make version, include the rest of the bmakelib suite.
+#   If it's a supported Make version, include the rest of the bmakelib suite.
 ####################################################################################################
 
 export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 include $(bmakelib.ROOT)/error-if-blank.Makefile
 include $(bmakelib.ROOT)/default-if-blank.Makefile
+include $(bmakelib.ROOT)/timed.Makefile

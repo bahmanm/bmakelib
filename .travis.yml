@@ -18,6 +18,7 @@ jobs:
         PATH="/usr/local/bin:$PATH" make test
 
     - name: jammy (22.04)
+      if: commit_message =~ /\!jammy/
       os: linux
       dist: jammy
       install: >-
@@ -34,7 +35,7 @@ jobs:
     # Only run for the main branch.
     # Travis OSX jobs are 5x more expensive than Linux ones.
     - name: osx xcode12
-      if: commit_message =~ /!osx/
+      if: branch = main
       os: osx
       osx_image: xcode12
       before_install: brew update

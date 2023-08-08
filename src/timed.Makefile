@@ -66,7 +66,7 @@
 	     $(info Target '$(*)' took $(bmakelib.vars.timed.duration.$(*))ms to complete.))
 
 ####################################################################################################
-#   Wether to define the convenience target %!timed.
+#   Whether to define the convenience target %!timed.
 #   Set to 'no' *before* including bmakelib to disable.
 ####################################################################################################
 

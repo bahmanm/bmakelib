@@ -28,7 +28,6 @@ function single_var_exit_when_blank {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-#include ${BMAKELIB_ROOT}/bmakelib.Makefile
 include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 
 .PHONY : echo-var1

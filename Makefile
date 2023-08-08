@@ -19,9 +19,13 @@ SHELL := /usr/bin/env bash -e -o pipefail
 ####################################################################################################
 
 NAME := bmakelib
-ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 DIST := $(ROOT)dist/
 VERSION := $(file < $(ROOT)src/VERSION)
+
+####################################################################################################
+
+include src/bmakelib.Makefile
 
 ####################################################################################################
 

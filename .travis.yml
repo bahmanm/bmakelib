@@ -18,7 +18,7 @@ jobs:
         PATH="/usr/local/bin:$PATH" make test
 
     - name: jammy (22.04)
-      if: commit_message =~ /\!jammy/
+      if: commit_message =~ /build\!jammy/
       os: linux
       dist: jammy
       install: >-

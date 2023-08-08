@@ -34,7 +34,7 @@ jobs:
     # Only run for the main branch.
     # Travis OSX jobs are 5x more expensive than Linux ones.
     - name: osx xcode12
-      if: branch = main
+      if: commit_message =~ /!osx/
       os: osx
       osx_image: xcode12
       before_install: brew update

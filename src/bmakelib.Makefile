@@ -21,22 +21,36 @@
 bmakelib.MIN_MAKE_VERSION := 4.4
 
 ####################################################################################################
+# Expands to a single newline (\n)
+####################################################################################################
+
+define bmakelib.newline :=
+
+
+endef
+
+####################################################################################################
+# Expands to a comma (,)
+####################################################################################################
+
+define bmakelib.comma :=
+,
+endef
+
+####################################################################################################
+# Expands to a backslash (\)
+####################################################################################################
+
+bmakelib.backslash := $(subst ,\,)
+
+####################################################################################################
 #   Abort with, hopefully, an informative message if it's an unsupported Make version.
 ####################################################################################################
 
 ifeq ($(shell perl -E 'print $$1 if "$(MAKE_VERSION)" =~ /^\s*(\d+(\.\d+)?)/ && $$1 >= $(bmakelib.MIN_MAKE_VERSION)'),)
 
-# Expands to a newline
-define bmakelib.newline
-
-
-endef
-
 # Expands to 8 consequtive spaces
 bmakelib.octospace := $(subst ,        ,)
-
-# Expands to a backslash
-bmakelib.backslash := $(subst ,\,)
 
 # Abort
 $(error \

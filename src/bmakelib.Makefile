@@ -82,3 +82,4 @@ export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 include $(bmakelib.ROOT)/error-if-blank.Makefile
 include $(bmakelib.ROOT)/default-if-blank.Makefile
 include $(bmakelib.ROOT)/timed.Makefile
+include $(bmakelib.ROOT)/logged.Makefile

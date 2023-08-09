@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © 2023 Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# emit an info message and echo the command run when bmakelib.conf.logged.SILENT is no and
+# bmakelib.conf.logged.ECHO_COMMAND is yes.
+####################################################################################################
+
+function when_silent_is_no_and_echo_command_is_yes {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit logged prereq...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=yes \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+
+exec .+ \\
+\s*&& trap .+ \\
+\s*&& exec .+ \\
+\s*&& make -f .+ some-target
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with implicit logged prereq...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+# emit an info message but not echo the command run when bmakelib.conf.logged.SILENT is no and
+# bmakelib.conf.logged.ECHO_COMMAND is no.
+####################################################################################################
+
+function when_silent_is_no_and_echo_command_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit logged prereq...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with implicit logged prereq...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+# echo the command run but no info message when bmakelib.conf.logged.SILENT is yes and
+# bmakelib.conf.logged.ECHO_COMMAND is yes.
+####################################################################################################
+
+function when_silent_is_yes_and_echo_command_is_yes {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit logged prereq...
+EOF
+
+  make bmakelib.conf.logged.SILENT=yes \
+       bmakelib.conf.logged.ECHO_COMMAND=yes \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
+make.+Entering.+
+\s*exec .+ \\
+\s*&& trap .+ \\
+\s*&& exec .+ \\
+\s*&& make -f .+ some-target
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with implicit logged prereq...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+# write no extra output when bmakelib.conf.logged.SILENT is yes and
+# bmakelib.conf.logged.ECHO_COMMAND is no.
+####################################################################################################
+
+function when_silent_is_yes_and_echo_command_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit logged prereq...
+EOF
+
+  make bmakelib.conf.logged.SILENT=yes \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with implicit logged prereq...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+
+test_cases=( when_silent_is_no_and_echo_command_is_yes \
+               when_silent_is_no_and_echo_command_is_no \
+               when_silent_is_yes_and_echo_command_is_yes \
+               when_silent_is_yes_and_echo_command_is_no )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in ${test_cases[@]}; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

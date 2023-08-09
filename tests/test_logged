@@ -21,8 +21,7 @@ test_suite_name=$(basename $BASH_SOURCE)
 source ${root_dir}tests/lib.sh
 
 ####################################################################################################
-# emit an info message and echo the command run when bmakelib.conf.logged.SILENT is no and
-# bmakelib.conf.logged.ECHO_COMMAND is yes.
+# the case when bmakelib.conf.logged.SILENT is no and bmakelib.conf.logged.ECHO_COMMAND is yes.
 ####################################################################################################
 
 function when_silent_is_no_and_echo_command_is_yes {
@@ -75,8 +74,7 @@ EOF
 }
 
 ####################################################################################################
-# emit an info message but not echo the command run when bmakelib.conf.logged.SILENT is no and
-# bmakelib.conf.logged.ECHO_COMMAND is no.
+# the case when bmakelib.conf.logged.SILENT is no and bmakelib.conf.logged.ECHO_COMMAND is no.
 ####################################################################################################
 
 function when_silent_is_no_and_echo_command_is_no {
@@ -125,8 +123,7 @@ EOF
 }
 
 ####################################################################################################
-# echo the command run but no info message when bmakelib.conf.logged.SILENT is yes and
-# bmakelib.conf.logged.ECHO_COMMAND is yes.
+# the case when bmakelib.conf.logged.SILENT is yes and bmakelib.conf.logged.ECHO_COMMAND is yes.
 ####################################################################################################
 
 function when_silent_is_yes_and_echo_command_is_yes {
@@ -178,8 +175,7 @@ EOF
 }
 
 ####################################################################################################
-# write no extra output when bmakelib.conf.logged.SILENT is yes and
-# bmakelib.conf.logged.ECHO_COMMAND is no.
+# the case when bmakelib.conf.logged.SILENT is yes and bmakelib.conf.logged.ECHO_COMMAND is no.
 ####################################################################################################
 
 function when_silent_is_yes_and_echo_command_is_no {
@@ -227,11 +223,71 @@ EOF
 }
 
 ####################################################################################################
+# the case where a target has a prerequisite to a logged target!
+####################################################################################################
+
+function explicit_prerequisite {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
+
+.PHONY : target-to-log
+
+target-to-log :
+	@echo Running target-to-log...
+
+.PHONY : some-target
+
+some-target : target-to-log!!logged
+	@echo Running some-target with explicitly logged prereq...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=yes \
+       some-target > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target target-to-log to .+
+\s*exec .+ \\
+\s*&& trap .+ \\
+\s*&& exec .+ \\
+\s*&& make -f .+ target-to-log
+Running some-target with explicitly logged prereq...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running target-to-log...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
 
 test_cases=( when_silent_is_no_and_echo_command_is_yes \
                when_silent_is_no_and_echo_command_is_no \
                when_silent_is_yes_and_echo_command_is_yes \
-               when_silent_is_yes_and_echo_command_is_no )
+               when_silent_is_yes_and_echo_command_is_no \
+               explicit_prerequisite )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

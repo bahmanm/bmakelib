@@ -35,7 +35,7 @@ include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 .PHONY : some-target
 
 some-target :
-	@echo Running some-target with implicit logged prereq...
+	@echo Running some-target...
 EOF
 
   make bmakelib.conf.logged.SILENT=no \
@@ -64,7 +64,7 @@ EOF
   local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
   bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
 make.+Entering.+
-Running some-target with implicit logged prereq...
+Running some-target...
 make.+Leaving.+
 EOF
 
@@ -89,7 +89,7 @@ include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 .PHONY : some-target
 
 some-target :
-	@echo Running some-target with implicit logged prereq...
+	@echo Running some-target...
 EOF
 
   make bmakelib.conf.logged.SILENT=no \
@@ -114,7 +114,7 @@ EOF
   local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
   bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
 make.+Entering.+
-Running some-target with implicit logged prereq...
+Running some-target...
 make.+Leaving.+
 EOF
 
@@ -139,7 +139,7 @@ include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 .PHONY : some-target
 
 some-target :
-	@echo Running some-target with implicit logged prereq...
+	@echo Running some-target...
 EOF
 
   make bmakelib.conf.logged.SILENT=yes \
@@ -167,7 +167,7 @@ EOF
   local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
   bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
 make.+Entering.+
-Running some-target with implicit logged prereq...
+Running some-target...
 make.+Leaving.+
 EOF
 
@@ -192,7 +192,7 @@ include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.Makefile
 .PHONY : some-target
 
 some-target :
-	@echo Running some-target with implicit logged prereq...
+	@echo Running some-target...
 EOF
 
   make bmakelib.conf.logged.SILENT=yes \
@@ -216,7 +216,7 @@ EOF
   local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
   bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
 make.+Entering.+
-Running some-target with implicit logged prereq...
+Running some-target...
 make.+Leaving.+
 EOF
 

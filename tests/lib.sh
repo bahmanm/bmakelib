@@ -15,10 +15,12 @@
 ####################################################################################################
 
 ####################################################################################################
-# bmakelib.test.cat.error FILENAME
+# bmakelib.test.cat.error FILENAME LINE_PREFIX
 ####################################################################################################
 function bmakelib.test.cat.error {
-  cat "$@" >&2
+  while read -r line; do
+    bmakelib.test.echo.error "$2$line"
+  done < $1
 }
 
 ####################################################################################################
@@ -32,14 +34,14 @@ function bmakelib.test.cat {
 # bmakelib.test.echo.error MSG
 ####################################################################################################
 function bmakelib.test.echo.error {
-  echo "$@" >&2
+  echo -e "$@" >&2
 }
 
 ####################################################################################################
 # echo MSG
 ####################################################################################################
 function bmakelib.test.echo {
-  echo "$@"
+  echo -e "$@"
 }
 
 ####################################################################################################
@@ -129,15 +131,12 @@ EOF
         )
 
   if ! perl -E "$perl_script" $actual_value_filename $expected_pattern_filename; then
-    bmakelib.test.echo.error "${test_case_name}: ERROR: actual result does not match the expected pattern."
+    bmakelib.test.echo.error "${test_case_name}: ERROR at $(basename ${BASH_SOURCE[1]}):${BASH_LINENO}"
+    bmakelib.test.echo.error "${test_case_name}: actual result does not match the expected pattern."
     bmakelib.test.echo.error "${test_case_name}: Received:"
-    bmakelib.test.echo.error '```'
-    bmakelib.test.cat.error $actual_value_filename
-    bmakelib.test.echo.error '```'
-    bmakelib.test.echo.error "${test_case_name}: But expected:"
-    bmakelib.test.echo.error '```'
-    bmakelib.test.cat.error $expected_pattern_filename
-    bmakelib.test.echo.error '```'
+    bmakelib.test.cat.error $actual_value_filename "    "
+    bmakelib.test.echo.error "${test_case_name}: Expected:"
+    bmakelib.test.cat.error $expected_pattern_filename "    "
     return 1
   fi
 }

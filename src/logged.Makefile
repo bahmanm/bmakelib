@@ -20,7 +20,7 @@
 #
 #   # Notes
 #
-#     * The name contains two consequitve exclamation marks (!!).  That is to denote that it runs a
+#     * The name contains two consecutive exclamation marks (!!).  That is to denote that it runs a
 #       a new make process.
 #     * The log file name format is TARGET_NAME-%Y%m%d-%H%M%s-%N.logged a la date command.
 #
@@ -34,7 +34,7 @@
 #
 #   Shell:
 #       ```
-#       $ make my-target!!bmakelib.timed
+#       $ make my-target!!bmakelib.logged
 #       Logging target some-target to some-target-20230808-16221691536940-884103049.logged
 #       exec 3>&1 4>&2 \
 #       && trap 'exec 2>&4 1>&3' 0 1 2 3 \
@@ -75,7 +75,7 @@
 bmakelib.conf.logged.convenience-target ?= yes
 
 ####################################################################################################
-#   Convenice target with a shorter and more intuitive name.  It's a drop-in replacement for
+#   Convenience target with a shorter and more intuitive name.  It's a drop-in replacement for
 #   %!!bmakelib.logged.
 #
 #   Lets you write
@@ -131,7 +131,7 @@ endef
 # $(bmakelib.logged._logged-shell-command COMMAND,LOGFILE)
 #
 # Expands to the sequence of commands that redirect stdout/err to LOGFILE, execute COMMAND and
-# resotre stdout/err once done.
+# restore stdout/err once done.
 #
 # If bmakelib.conf.logged.ECHO_COMMAND is set to no, causes the command to not be echo'ed.
 ####################################################################################################

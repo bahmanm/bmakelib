@@ -62,11 +62,11 @@ $(RPMBUILD) :
 
 ####################################################################################################
 
-.PHONY : package-rpm
+.PHONY : package-rpm._preprocess
 
-package-rpm : $(RPMBUILD) $(RPMSPEC)
-package-rpm : $(DIST)$(NAME)-$(VERSION).tar.gz
-package-rpm :
+package-rpm._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
+package-rpm._preprocess : $(RPMBUILD) $(RPMSPEC)
+package-rpm._preprocess :
 	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(RPMBUILD)SOURCES
 	summary="$$(perl -nE 'print if $$. == 2' < $(ROOT)README.md)" \
 	source1='$(URL)/archive/refs/tags/v$(VERSION).tar.gz' \
@@ -79,13 +79,41 @@ package-rpm :
 		-E 's/%{source0}/$(NAME)-$(VERSION).tar.gz/;' \
 		-E 's/(Source0:\s*).+/$$1$(NAME)-$(VERSION).tar.gz/;' \
 		$(RPMSPEC)
+
+####################################################################################################
+
+.PHONY : package-rpm._run-rpmbuild-env
+
+package-rpm._run-rpmbuild-env :
+	docker build -t $(NAME)-rpmbuild-env - < $(ROOT)pkg/rpmbuild-env.Dockerfile
+	docker run --rm -v $(ROOT):/project $(NAME)-rpmbuild-env make package-rpm._build
+
+####################################################################################################
+
+.PHONY : package-rpm._build
+
+package-rpm._build :
 	rpmdev-bumpspec -r $(RPMSPEC)
 	rpmbuild \
 		--define='_topdir $(RPMBUILD)' \
 		--define='source0 $(URL)/archive/refs/tags/v$(VERSION).tar.gz' \
 		-ba $(RPMSPEC)
+
+####################################################################################################
+
+.PHONY : package-rpm._postprocess
+
+package-rpm._postprocess :
 	cp $(RPMBUILD)RPMS/noarch/*.rpm $(RPMBUILD)SRPMS/*.rpm $(DIST)
 	cp $(RPMSPEC) $(ROOT)/pkg
+
+####################################################################################################
+
+.PHONY : package-rpm
+
+package-rpm : package-rpm._preprocess
+package-rpm : package-rpm._run-rpmbuild-env
+package-rpm : package-rpm._postprocess
 
 ####################################################################################################
 
@@ -125,6 +153,7 @@ clean :
 
 test : export bmakelib.ROOT := $(ROOT)src/
 test : tests.dir := $(shell mktemp -d)
-test : tests.all := $(shell git ls-files -com --deduplicate --exclude-standard tests | grep 'test_')
+test : tests.all := $(shell find tests -type f \
+				\( -name 'test_*' $(shell xargs -I{} echo "! -name '{}'" < .gitignore ) \))
 test :
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner

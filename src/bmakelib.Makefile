@@ -78,8 +78,9 @@ endif
 ####################################################################################################
 
 export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
 
-include $(bmakelib.ROOT)/error-if-blank.Makefile
-include $(bmakelib.ROOT)/default-if-blank.Makefile
-include $(bmakelib.ROOT)/timed.Makefile
-include $(bmakelib.ROOT)/logged.Makefile
+include $(bmakelib.ROOT)error-if-blank.Makefile
+include $(bmakelib.ROOT)default-if-blank.Makefile
+include $(bmakelib.ROOT)timed.Makefile
+include $(bmakelib.ROOT)logged.Makefile

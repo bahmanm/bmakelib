@@ -1,0 +1,5 @@
+bmakelib (0.1.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Bahman Movaqar <bahman@unknown>  Fri, 11 Aug 2023 16:46:02 -0700

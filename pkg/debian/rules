@@ -26,4 +26,5 @@ include /usr/share/dpkg/default.mk
 #	dh_auto_configure -- \
 #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
 
-override_dh_auto_test : ;
+# `install' already depends on `build' which depends on `test'
+dh_auto_test : ;

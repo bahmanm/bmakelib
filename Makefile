@@ -126,9 +126,8 @@ package-deb._build :
 	cd $(BUILD)/deb/$(NAME)-$(VERSION) \
 		&& debuild \
 			--preserve-envvar=PATH \
-			--rootcmd=fakeroot \
 			--no-tgz-check \
-			-us -uc
+			-us -uc -F
 
 ####################################################################################################
 

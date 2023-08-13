@@ -1,0 +1,15 @@
+Source: bmakelib
+Priority: optional
+Maintainer: Bahman Movaqar <bahman@unknown>
+Build-Depends: debhelper (>= 9), perl, bash
+Standards-Version: 3.9.5
+Section: libs
+Homepage: https://github.com/bahmanm/bmakelib
+Vcs-Git: git@github.com:bahmanm/bmakelib.git
+Vcs-Browser: https://github.com/bahmanm/bmakelib
+
+Package: bmakelib
+Architecture: all
+Depends: perl, bash
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>

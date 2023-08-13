@@ -101,6 +101,44 @@ package-rpm._build :
 
 ####################################################################################################
 
+.PHONY : package-deb._preprocess
+
+package-deb._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
+package-deb._preprocess :
+	mkdir -p $(BUILD)deb
+	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(BUILD)deb/$(NAME)_$(VERSION).orig.tar.gz  # see debuild
+	tar -C $(BUILD)deb -xzf $(DIST)$(NAME)-$(VERSION).tar.gz
+	cp -r $(ROOT)pkg/debian $(BUILD)deb/$(NAME)-$(VERSION)
+
+####################################################################################################
+
+.PHONY : package-deb._run-debbuild-env
+
+package-deb._run-debbuild-env :
+	docker build -t $(NAME)-debbuild-env - < $(ROOT)pkg/debbuild-env.Dockerfile
+	docker run --rm -v $(ROOT):/project $(NAME)-debbuild-env make package-deb._build
+
+####################################################################################################
+
+.PHONY : package-deb._build
+
+package-deb._build :
+	cd $(BUILD)/deb/$(NAME)-$(VERSION) \
+		&& debuild \
+			--preserve-envvar=PATH \
+			--rootcmd=fakeroot \
+			--no-tgz-check \
+			-us -uc
+
+####################################################################################################
+
+.PHONY : package-deb
+
+package-deb : package-deb._preprocess
+package-deb : package-deb._run-debbuild-env
+
+####################################################################################################
+
 .PHONY : package-rpm._postprocess
 
 package-rpm._postprocess :
@@ -129,16 +167,16 @@ build :
 
 ####################################################################################################
 
-PREFIX ?= /usr/local
+PREFIX ?= $(DESTDIR)/usr
 
 .PHONY : install
 
 install : build
 install :
 	install --mode=u=rwx,g=rx,o=rx -d $(PREFIX)/include/$(NAME)
-	install --mode=u=rwx,g=rx,o=rx -d $(PREFIX)/doc/$(NAME)
+	install --mode=u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME)
 	find $(BUILD)include -type f -exec install --mode=u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \;
-	install --mode=u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/doc/$(NAME)
+	install --mode=u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME)
 
 ####################################################################################################
 

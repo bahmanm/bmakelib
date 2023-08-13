@@ -25,6 +25,7 @@ VERSION = $(file < $(ROOT)src/VERSION)
 BUILD := $(ROOT)_build/
 RPMBUILD := $(BUILD)rpmbuild/
 RPMSPEC := $(RPMBUILD)SPECS/bmakelib.spec
+DEBBUILD := $(BUILD)debbuild/
 DIST := $(ROOT)dist/
 
 ####################################################################################################
@@ -101,14 +102,35 @@ package-rpm._build :
 
 ####################################################################################################
 
+.PHONY : package-rpm._postprocess
+
+package-rpm._postprocess :
+	cp $(RPMBUILD)RPMS/noarch/*.rpm $(RPMBUILD)SRPMS/*.rpm $(DIST)
+	cp $(RPMSPEC) $(ROOT)/pkg
+
+####################################################################################################
+
+.PHONY : package-rpm
+
+package-rpm : package-rpm._preprocess
+package-rpm : package-rpm._run-rpmbuild-env
+package-rpm : package-rpm._postprocess
+
+####################################################################################################
+
+$(DEBBUILD) :
+	mkdir -p $(DEBBUILD)
+
+####################################################################################################
+
 .PHONY : package-deb._preprocess
 
 package-deb._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
+package-deb._preprocess : $(DEBBUILD)
 package-deb._preprocess :
-	mkdir -p $(BUILD)deb
-	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(BUILD)deb/$(NAME)_$(VERSION).orig.tar.gz  # see debuild
-	tar -C $(BUILD)deb -xzf $(DIST)$(NAME)-$(VERSION).tar.gz
-	cp -r $(ROOT)pkg/debian $(BUILD)deb/$(NAME)-$(VERSION)
+	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  # see debuild
+	tar -C $(DEBBUILD) -xzf $(DIST)$(NAME)-$(VERSION).tar.gz
+	cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION)
 
 ####################################################################################################
 
@@ -123,7 +145,7 @@ package-deb._run-debbuild-env :
 .PHONY : package-deb._build
 
 package-deb._build :
-	cd $(BUILD)/deb/$(NAME)-$(VERSION) \
+	cd $(DEBBUILD)$(NAME)-$(VERSION) \
 		&& debuild \
 			--preserve-envvar=PATH \
 			--no-tgz-check \
@@ -131,26 +153,23 @@ package-deb._build :
 
 ####################################################################################################
 
+.PHONY : pakacge-dev._postprocess
+
+package-deb._postprocess :
+	cp \
+		$(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz \
+		$(DEBBUILD)$(NAME)_$(VERSION)-*.debian.tar.xz \
+		$(DEBBUILD)$(NAME)_$(VERSION)-*.dsc \
+		$(DEBBUILD)$(NAME)_$(VERSION)-*_all.deb \
+		$(DIST)
+
+####################################################################################################
+
 .PHONY : package-deb
 
 package-deb : package-deb._preprocess
 package-deb : package-deb._run-debbuild-env
-
-####################################################################################################
-
-.PHONY : package-rpm._postprocess
-
-package-rpm._postprocess :
-	cp $(RPMBUILD)RPMS/noarch/*.rpm $(RPMBUILD)SRPMS/*.rpm $(DIST)
-	cp $(RPMSPEC) $(ROOT)/pkg
-
-####################################################################################################
-
-.PHONY : package-rpm
-
-package-rpm : package-rpm._preprocess
-package-rpm : package-rpm._run-rpmbuild-env
-package-rpm : package-rpm._postprocess
+package-deb : package-deb._postprocess
 
 ####################################################################################################
 

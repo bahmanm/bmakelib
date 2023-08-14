@@ -15,7 +15,7 @@
 
 Name:           bmakelib
 Version:        0.1.0
-Release:        1%{?dist}.0
+Release:        1%{?dist}.2
 Summary:        The minimalist Make standard library you'd always wished for!
 License:        Apache License 2.0
 URL:            https://github.com/bahmanm/bmakelib
@@ -37,13 +37,19 @@ rm -rf ${RPM_BUILD_ROOT}/*
 make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 
 %files
-%{_includedir}/bmakelib/bmakelib.Makefile
-%{_includedir}/bmakelib/error-if-blank.Makefile
-%{_includedir}/bmakelib/default-if-blank.Makefile
-%{_includedir}/bmakelib/timed.Makefile
-%{_includedir}/bmakelib/logged.Makefile
+%{_includedir}/bmakelib/bmakelib.mk
+%{_includedir}/bmakelib/error-if-blank.mk
+%{_includedir}/bmakelib/default-if-blank.mk
+%{_includedir}/bmakelib/timed.mk
+%{_includedir}/bmakelib/logged.mk
 %{_includedir}/bmakelib/VERSION
-%{_prefix}/doc/bmakelib/LICENSE
-%{_prefix}/doc/bmakelib/VERSION
+%{_prefix}/share/doc/bmakelib/LICENSE
+%{_prefix}/share/doc/bmakelib/VERSION
 
 %changelog
+* Mon Aug 14 2023 rpmbuild - 0.1.0-1.2
+- rebuilt
+
+* Mon Aug 14 2023 rpmbuild - 0.1.0-1.1
+- rebuilt
+

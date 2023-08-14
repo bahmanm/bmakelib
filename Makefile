@@ -179,7 +179,7 @@ build : $(BUILD)
 build : test
 build :
 	mkdir -p $(BUILD)include
-	find src -type f \( -name '*.Makefile' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \;
+	find src -type f \( -name '*.mk' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \;
 	mkdir -p $(BUILD)doc
 	cp LICENSE src/VERSION $(BUILD)doc
 

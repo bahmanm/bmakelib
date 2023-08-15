@@ -1,7 +1,5 @@
 # bmakelib  [![Build Status](https://app.travis-ci.com/bahmanm/bmakelib.svg?branch=main)](https://app.travis-ci.com/bahmanm/bmakelib) ![Static Badge](https://img.shields.io/badge/license-Apache_License_v2.0-blue) ![Static Badge](https://img.shields.io/badge/dependencies-NONE-green)
 
-
-
 The minimalist Make standard library you'd always wished for!
 
 bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment

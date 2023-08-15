@@ -69,16 +69,9 @@ package-rpm._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
 package-rpm._preprocess : $(RPMBUILD) $(RPMSPEC)
 package-rpm._preprocess :
 	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(RPMBUILD)SOURCES
-	summary="$$(perl -nE 'print if $$. == 2' < $(ROOT)README.md)" \
-	source1='$(URL)/archive/refs/tags/v$(VERSION).tar.gz' \
-	description="$${summary}  Souce archive available at $${source1}" \
 	perl -pi \
-		-E 's/%{version}/$(VERSION)/;' \
-		-E 's/(Version:\s*).+/$${1}$(VERSION)/;' \
-		-E 's/%{summary}/$$ENV{summary}/;' \
-		-E 's/(Summary:\s*).+/$$1$$ENV{summary}/;' \
-		-E 's/%{source0}/$(NAME)-$(VERSION).tar.gz/;' \
-		-E 's/(Source0:\s*).+/$$1$(NAME)-$(VERSION).tar.gz/;' \
+		-E 's#(Version:\s*).+#$${1}$(VERSION)#;' \
+		-E 's#(Source0:\s*).+#$${1}$(NAME)-$(VERSION).tar.gz#;' \
 		$(RPMSPEC)
 
 ####################################################################################################
@@ -201,7 +194,8 @@ install :
 	install --mode=u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME)
 	find $(BUILD)include -type f -exec install --mode=u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \;
 	install --mode=u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME)
-	install --mode=u=rw,g=r,o=r $(ROOT)doc/*.md $(PREFIX)/share/doc/
+	find $(BUILD)doc -type f -name '*.md' \
+		-exec install --mode=u=rw,g=r,o=r {} $(PREFIX)/share/doc/$(NAME) \;
 
 ####################################################################################################
 

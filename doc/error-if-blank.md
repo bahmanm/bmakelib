@@ -6,7 +6,7 @@ Fails make with an error message if the provided variable(s) are blank.
 
 Makefile:
 
-```
+```Makefile
 VAR1 =
 VAR2 = 100
 some-target : bmakelib.error-if-blank( VAR1 VAR2 )

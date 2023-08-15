@@ -29,7 +29,7 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	some-target :
 #		@echo Running some-target...
 #	```
@@ -51,7 +51,7 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	some-target :
 #		@echo Running some-target...
 #	```
@@ -93,7 +93,7 @@ bmakelib.conf.logged.convenience-target ?= yes
 #
 #   Lets you write
 #
-#	```
+#	```Makefile
 #	some-target : other-target!!logged
 #	```
 #

@@ -27,7 +27,7 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	my-target :
 #		@sleep 2
 #		@echo my-target is done
@@ -46,7 +46,7 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	some-target :
 #		@sleep 2
 #
@@ -90,7 +90,7 @@ bmakelib.conf.timed.convenience-target ?= yes
 #
 #   Lets you write
 #
-#	```
+#	```Makefile
 #	some-target : other-target!timed
 #	```
 #

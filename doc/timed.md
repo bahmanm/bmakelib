@@ -10,7 +10,7 @@ The following variables will be populated:
 
 Makefile:
 
-```
+```Makefile
 my-target :
 	@sleep 2
 	@echo my-target is done
@@ -29,7 +29,7 @@ Target 'my-target' took 2009ms to complete.
 
 Makefile:
 
-```
+```Makefile
 some-target :
 	@sleep 2
 
@@ -54,7 +54,7 @@ Convenice target with a shorter and more intuitive name.  It's a drop-in replace
 
 Lets you write
 
-```
+```Makefile
 some-target : other-target!timed
 ```
 

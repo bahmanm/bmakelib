@@ -10,7 +10,7 @@ It will also emit an "info" message if the value of `bmakelib.conf.default-if-bl
 Currently there's no way to pass a value which contains spaces for a variable.  That is, the
 following will have undesired effects:
 
-```
+```Makefile
 some-target : bmakelib.default-if-blank( VAR1,hello world )
 ```
 
@@ -18,7 +18,7 @@ some-target : bmakelib.default-if-blank( VAR1,hello world )
 
 Makefile:
 
-```
+```Makefile
 VAR1 =
 VAR2 = 100
 some-target : bmakelib.default-if-blank( VAR1,foo VAR2,bar )
@@ -36,10 +36,9 @@ foo, 100
 
 Makefile:
 
-```
+```Makefile
 some-target : bmakelib.default-if-blank( VAR1,foo )
 	@echo $(VAR1)
-	...
 ```
 
 Shell:

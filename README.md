@@ -1,7 +1,5 @@
 # bmakelib  [![Build Status](https://app.travis-ci.com/bahmanm/bmakelib.svg?branch=main)](https://app.travis-ci.com/bahmanm/bmakelib) ![Static Badge](https://img.shields.io/badge/license-Apache_License_v2.0-blue) ![Static Badge](https://img.shields.io/badge/dependencies-NONE-green)
 
-
-
 The minimalist Make standard library you'd always wished for!
 
 bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment
@@ -12,7 +10,57 @@ and maintain* Makefiles.
 
 
 # How To Install
-TBD
+
+## Prerequisites
+
+Although not an installation dependency, bmakelib relies on **Gnu Make 4.4+** which was released
+back in 2022.
+
+To check the version which is currently installed, simply `make -v` in a terminal.  The output should
+look like below.
+
+```
+$ make -v
+GNU Make 4.4.1
+Built for x86_64-suse-linux-gnu
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+```
+
+Installing Gnu Make is quite easy.  In fact as easy as:
+
+```
+$ wget https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+$ tar xzf make-4.4.1.tar.gz
+$ cd make-4.4.1
+$ ./configure --prefix=/usr/local
+$ make install
+```
+
+## Installing bmakelib
+
+### RPM-based Linux Distro
+
+Simply grab the prepackaged RPM from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
+and install it using your faourite method, eg `rpm -i bmakelib-0.1.0-1.1.rpm`.
+
+### DEB-based Linux Distro
+
+Simply grab the prepackaged DEB from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
+and install it using your faourite method, eg `dpkg -i bmakelib_0.1.0-1_all.deb`.
+
+### Installing From Source
+
+Grab the source archive from the [release page](https://github.com/bahmanm/bmakelib/releases/latest), 
+eg `bmakelib-0.1.0.tar.gz`.
+
+```
+$ tar zxf bmakelib-0.1.0.tar.gz
+$ cd bmakelib-0.1.0
+$ sudo PREFIX=/usr/local make install 
+```
 
 # How To Use - Examples
 

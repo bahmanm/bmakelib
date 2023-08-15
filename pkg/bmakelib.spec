@@ -15,41 +15,60 @@
 
 Name:           bmakelib
 Version:        0.1.0
-Release:        1%{?dist}.2
+Release:        1%{?dist}
 Summary:        The minimalist Make standard library you'd always wished for!
-License:        Apache License 2.0
+License:        Apache License v2.0
 URL:            https://github.com/bahmanm/bmakelib
 Source0:        bmakelib-0.1.0.tar.gz
 BuildRequires:  bash perl make
 BuildArch:      noarch
 Requires:       bash perl make
 
+####################################################################################################
+
 %description
+bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment
+your Makefiles.
+
+The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read
+and maintain* Makefiles.
+
+####################################################################################################
 
 %prep
 %setup -q
 
+####################################################################################################
+
 %build
 make %{?_smp_mflags} test
+
+####################################################################################################
 
 %install
 rm -rf ${RPM_BUILD_ROOT}/*
 make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 
+####################################################################################################
+
 %files
+
 %{_includedir}/bmakelib/bmakelib.mk
 %{_includedir}/bmakelib/error-if-blank.mk
 %{_includedir}/bmakelib/default-if-blank.mk
 %{_includedir}/bmakelib/timed.mk
 %{_includedir}/bmakelib/logged.mk
 %{_includedir}/bmakelib/VERSION
+
 %{_prefix}/share/doc/bmakelib/LICENSE
 %{_prefix}/share/doc/bmakelib/VERSION
+%{_prefix}/share/doc/bmakelib/README.md
+%{_prefix}/share/doc/bmakelib/bmakelib.md
+%{_prefix}/share/doc/bmakelib/error-if-blank.md
+%{_prefix}/share/doc/bmakelib/default-if-blank.md
+%{_prefix}/share/doc/bmakelib/timed.md
+%{_prefix}/share/doc/bmakelib/logged.md
+
+####################################################################################################
 
 %changelog
-* Mon Aug 14 2023 rpmbuild - 0.1.0-1.2
-- rebuilt
-
-* Mon Aug 14 2023 rpmbuild - 0.1.0-1.1
-- rebuilt
-

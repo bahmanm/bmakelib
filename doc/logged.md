@@ -12,7 +12,7 @@ Log the output of a given target to file.
 
 Makefile:
 
-```
+```Makefile
 some-target :
 	@echo Running some-target...
 ```
@@ -34,7 +34,7 @@ Running some-target...
 
 Makefile:
 
-```
+```Makefile
 some-target :
 	@echo Running some-target...
 ```
@@ -65,7 +65,7 @@ Convenience target with a shorter and more intuitive name.  It's a drop-in repla
 
 Lets you write
 
-```
+```Makefile
 some-target : other-target!!logged
 ```
 

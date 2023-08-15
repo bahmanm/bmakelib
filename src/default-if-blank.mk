@@ -27,7 +27,7 @@
 #   Currently there's no way to pass a value which contains spaces for a variable.  That is, the
 #   following will have undesired effects:
 #
-#	```
+#	```Makefile
 #	some-target : bmakelib.default-if-blank( VAR1,hello world )
 #	```
 #
@@ -35,7 +35,7 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	VAR1 =
 #	VAR2 = 100
 #	some-target : bmakelib.default-if-blank( VAR1,foo VAR2,bar )
@@ -53,10 +53,9 @@
 #
 #   Makefile:
 #
-#	```
+#	```Makefile
 #	some-target : bmakelib.default-if-blank( VAR1,foo )
 #		@echo $(VAR1)
-#		...
 #	```
 #
 #   Shell:

@@ -1,5 +1,4 @@
-bmakelib (0.1.0-1) unstable; urgency=low
+bmakelib (%VERSION%-1) %DISTRO%; urgency=low
 
-  * Initial release
-
- -- Bahman Movaqar <bahman@unknown>  Fri, 11 Aug 2023 16:46:02 -0700
+ * Release %VERSION%
+ -- %GIT_USER% <%GIT_EMAIL%> %DATE%

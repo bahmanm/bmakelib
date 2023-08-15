@@ -14,12 +14,12 @@
 ####################################################################################################
 
 Name:           bmakelib
-Version:        0.1.0
+Version:        N/A
 Release:        1%{?dist}
 Summary:        The minimalist Make standard library you'd always wished for!
 License:        Apache License v2.0
 URL:            https://github.com/bahmanm/bmakelib
-Source0:        bmakelib-0.1.0.tar.gz
+Source0:        N/A
 BuildRequires:  bash perl make
 BuildArch:      noarch
 Requires:       bash perl make

@@ -14,7 +14,8 @@
 ####################################################################################################
 
 ####################################################################################################
-#   # bmakelib.default-if-blank(%)
+#>
+#   # `bmakelib.default-if-blank(%)`
 #
 #   If the given variable(s) is blank, sets its value to the provided default.
 #   It will also emit an "info" message if the value of `bmakelib.conf.default-if-blank.SILENT` is
@@ -26,44 +27,46 @@
 #   Currently there's no way to pass a value which contains spaces for a variable.  That is, the
 #   following will have undesired effects:
 #
-#       ```
-#       some-target : bmakelib.default-if-blank( VAR1,hello world )
-#       ```
+#	```
+#	some-target : bmakelib.default-if-blank( VAR1,hello world )
+#	```
 #
 #   ##  Example 1
 #
 #   Makefile:
 #
-#       ```
-#       VAR1 =
-#       VAR2 = 100
-#       some-target : bmakelib.default-if-blank( VAR1,foo VAR2,bar )
-#       	@echo $(VAR1), $(VAR2)
-# 	...
+#	```
+#	VAR1 =
+#	VAR2 = 100
+#	some-target : bmakelib.default-if-blank( VAR1,foo VAR2,bar )
+#		@echo $(VAR1), $(VAR2)
+#	```
 #
 #   Shell:
 #
-#       ```
-#       $ make some-target
-#       foo, 100
-#       ...
+#	```
+#	$ make some-target
+#	foo, 100
+#	```
 #
 #   ##  Example 2
 #
 #   Makefile:
 #
-#       ```
-#       some-target : bmakelib.default-if-blank( VAR1,foo )
-#       	@echo $(VAR1)
-# 	...
+#	```
+#	some-target : bmakelib.default-if-blank( VAR1,foo )
+#		@echo $(VAR1)
+#		...
+#	```
 #
 #   Shell:
 #
-#       ```
-#       $ make bmakelib.conf.default-if-blank.SILENT=no some-target
-#       Using default value 'foo' for variable 'VAR1'.
-#       foo
-#       ...
+#	```
+#	$ make bmakelib.conf.default-if-blank.SILENT=no some-target
+#	Using default value 'foo' for variable 'VAR1'.
+#	foo
+#	```
+#<
 ####################################################################################################
 
 .PHONY : bmakelib.default-if-blank(%)
@@ -79,19 +82,15 @@ bmakelib.default-if-blank(%) :
 			$(eval $(_varname) := $(_varval))))
 
 ####################################################################################################
-#    Expands to a single , (COMMA) character.
-####################################################################################################
-
-define bmakelib.comma
-,
-endef
-
-####################################################################################################
-#    Controls wether bmakelib.default-if-blank should emit an info message when using the default
-#    provided.
+#>
+#   # `bmakelib.conf.default-if-blank.SILENT`
 #
-#    Default is "yes" which means do NOT emit.
-#    Set to "no" to make it behave otherwise.
+#   Controls whether `bmakelib.default-if-blank` should emit an info message when using the default
+#   provided.
+#
+#   Default is "yes" which means do NOT emit.
+#   Set to "no" to make it behave otherwise.
+#<
 ####################################################################################################
 
 bmakelib.conf.default-if-blank.SILENT ?= yes

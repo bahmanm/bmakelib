@@ -14,48 +14,54 @@
 ####################################################################################################
 
 ####################################################################################################
-#   # %!bmakelib.timed
+#>
+#   # `%!bmakelib.timed`
 #
 #   Times the execution of a given target and report the duration with milliseconds precision.
 #   The following variables will be populated:
-#     * stdlib.vars.timed.begin-ts.TARGET_NAME (nanos)
-#     * stdlib.vars.timed.end-ts.TARGET_NAME (nanos)
-#     * stdlib.vars.timed.duration.TARGET_NAME (millis)
+#     * `stdlib.vars.timed.begin-ts.TARGET_NAME` (nanos)`
+#     * `stdlib.vars.timed.end-ts.TARGET_NAME` (nanos)`
+#     * `stdlib.vars.timed.duration.TARGET_NAME` (millis)`
 #
 #   # Example 1
 #
 #   Makefile:
-#       ```
-#       my-target :
-#       	@sleep 2
-#       	@echo my-target is done
-#       ```
+#
+#	```
+#	my-target :
+#		@sleep 2
+#		@echo my-target is done
+#	```
 #
 #   Shell:
-#       ```
-#       $ make my-target!bmakelib.timed
-#       Using default value 'yes' for variable 'stdlib.conf.timed.SILENT'
-#       my-target is done
-#       Target 'my-target' took 2009ms to complete.
-#       ```
+#
+#	```
+#	$ make my-target!bmakelib.timed
+#	Using default value 'yes' for variable 'stdlib.conf.timed.SILENT'
+#	my-target is done
+#	Target 'my-target' took 2009ms to complete.
+#	```
 #
 #   # Example 2
 #
 #   Makefile:
-#       ```
-#       some-target :
-#       	@sleep 2
 #
-#       my-target : stdlib.conf.timed.SILENT = yes
-#       my-target : some-target!bmakelib.timed
-#       	@echo ✅ Made some-target in $(stdlib.vars.timed.duration.some-target)ms 🙌
-#       ```
+#	```
+#	some-target :
+#		@sleep 2
+#
+#	my-target : stdlib.conf.timed.SILENT = yes
+#	my-target : some-target!bmakelib.timed
+#		@echo ✅ Made some-target in $(stdlib.vars.timed.duration.some-target)ms 🙌
+#	```
 #
 #   Shell:
-#        ```
-#        $ make my-target
-#        ✅ Made some-target in 2008ms 🙌
-#        ```
+#
+#	```
+#	$ make my-target
+#	✅ Made some-target in 2008ms 🙌
+#	```
+#<
 ####################################################################################################
 
 .PHONY : %!bmakelib.timed
@@ -66,26 +72,36 @@
 	     $(info Target '$(*)' took $(bmakelib.vars.timed.duration.$(*))ms to complete.))
 
 ####################################################################################################
-#   Whether to define the convenience target %!timed.
+#>
+#   # `bmakelib.conf.timed.convenience-target`
+#
+#   Whether to define the convenience target `%!bmakelib.timed`.
 #   Set to 'no' *before* including bmakelib to disable.
 ####################################################################################################
 
 bmakelib.conf.timed.convenience-target ?= yes
 
 ####################################################################################################
+#>
+#   # `%!timed`
+#
 #   Convenice target with a shorter and more intuitive name.  It's a drop-in replacement for
-#   %!bmakelib.timed.
+#   `%!bmakelib.timed`.
 #
 #   Lets you write
-#       ```
-#       some-target : other-target!timed
-#       ```
-#   or
-#       ```
-#       $ make my-target!timed
-#       ```
 #
-#   See also bmakelib.conf.timed.convenience-target
+#	```
+#	some-target : other-target!timed
+#	```
+#
+#   or
+#
+#	```
+#	$ make my-target!timed
+#	```
+#
+#   See also `bmakelib.conf.timed.convenience-target`.
+#<
 ####################################################################################################
 
 ifneq ($(bmakelib.conf.timed.convenience-target),no)
@@ -97,7 +113,11 @@ ifneq ($(bmakelib.conf.timed.convenience-target),no)
 endif
 
 ####################################################################################################
-# If set to yes, causes %!bmakelib.timed to emit an info containing the duration of the target.
+#>
+#    # `bmakelib.conf.timed.SILENT`
+#
+#    If set to yes, causes `%!bmakelib.timed` to emit an info containing the duration of the target.
+#<
 ####################################################################################################
 
 bmakelib.conf.timed.SILENT ?= no

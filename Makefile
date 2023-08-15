@@ -177,11 +177,16 @@ package-deb : package-deb._postprocess
 
 build : $(BUILD)
 build : test
+build : doc-update
 build :
 	mkdir -p $(BUILD)include
 	find src -type f \( -name '*.mk' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \;
 	mkdir -p $(BUILD)doc
-	cp LICENSE src/VERSION $(BUILD)doc
+	cp \
+		$(ROOT)LICENSE \
+		$(ROOT)src/VERSION \
+		$(ROOT)doc/*.md \
+		$(BUILD)doc
 
 ####################################################################################################
 
@@ -195,6 +200,7 @@ install :
 	install --mode=u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME)
 	find $(BUILD)include -type f -exec install --mode=u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \;
 	install --mode=u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME)
+	install --mode=u=rw,g=r,o=r $(ROOT)doc/*.md $(PREFIX)/share/doc/
 
 ####################################################################################################
 
@@ -213,3 +219,11 @@ test : tests.all := $(shell find tests -type f \
 				\( -name 'test_*' $(shell xargs -I{} echo "! -name '{}'" < .gitignore ) \))
 test :
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
+
+####################################################################################################
+
+.PHONY : doc-update
+
+doc-update :
+	cd $(ROOT)src \
+	&& find * -type f -name '*.mk' -exec $(ROOT)doc/update {} \;

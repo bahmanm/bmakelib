@@ -185,6 +185,7 @@ build :
 	cp \
 		$(ROOT)LICENSE \
 		$(ROOT)src/VERSION \
+		$(ROOT)README.md \
 		$(ROOT)doc/*.md \
 		$(BUILD)doc
 

@@ -1,6 +1,6 @@
 Source: bmakelib
 Priority: optional
-Maintainer: Bahman Movaqar <bahman@unknown>
+Maintainer: Bahman Movaqar <Bahman@BahmanM.com>
 Build-Depends: debhelper (>= 9), perl, bash
 Standards-Version: 3.9.5
 Section: libs
@@ -11,5 +11,7 @@ Vcs-Browser: https://github.com/bahmanm/bmakelib
 Package: bmakelib
 Architecture: all
 Depends: perl, bash
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: The minimalist Make standard library you'd always wished for!
+ bmakelib is a collection of useful targets, recipes and variables you can use to augment your Makefiles.
+ The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read
+ and maintain* Makefiles.

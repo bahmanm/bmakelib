@@ -99,7 +99,6 @@ package-rpm._build :
 
 package-rpm._postprocess :
 	cp $(RPMBUILD)RPMS/noarch/*.rpm $(RPMBUILD)SRPMS/*.rpm $(DIST)
-	cp $(RPMSPEC) $(ROOT)/pkg
 
 ####################################################################################################
 

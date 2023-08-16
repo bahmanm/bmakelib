@@ -3,3 +3,6 @@
 
 dist
 _build
+
+# debhelper
+generated

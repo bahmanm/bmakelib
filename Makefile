@@ -99,7 +99,6 @@ package-rpm._build :
 
 package-rpm._postprocess :
 	cp $(RPMBUILD)RPMS/noarch/*.rpm $(RPMBUILD)SRPMS/*.rpm $(DIST)
-	cp $(RPMSPEC) $(ROOT)/pkg
 
 ####################################################################################################
 
@@ -124,6 +123,16 @@ package-deb._preprocess :
 	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  # see debuild
 	tar -C $(DEBBUILD) -xzf $(DIST)$(NAME)-$(VERSION).tar.gz
 	cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION)
+	DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
+	USER=$$(git config user.name) \
+	EMAIL=$$(git config user.email) \
+	perl -pi \
+		-E 's/%VERSION%/$(VERSION)/;' \
+		-E 's/%DISTRO%/unstable/;' \
+		-E 's/%GIT_USER%/$$ENV{"USER"}/;' \
+		-E 's/%GIT_EMAIL%/$$ENV{"EMAIL"}/;' \
+		-E 's/%DATE%/$$ENV{"DATE"}/' \
+		$(DEBBUILD)$(NAME)-$(VERSION)/debian/changelog
 
 ####################################################################################################
 

@@ -1,4 +1,6 @@
-bmakelib (%VERSION%-1) %DISTRO%; urgency=low
+bmakelib (%VERSION%-1) %DISTRO%; urgency=medium
 
- * Release %VERSION%
- -- %GIT_USER% <%GIT_EMAIL%> %DATE%
+  * Release %VERSION%
+
+-- %GIT_USER% <%GIT_EMAIL%>   %DATE%
+

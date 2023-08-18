@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © 2023 Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# the case when a target is logged and then timed, ie my-target!!logged!timed
+####################################################################################################
+
+function when_logged_then_timed {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=yes \
+       some-target!!logged!timed > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+
+exec .+ \\
+\s*&& trap .+ \\
+\s*&& exec .+ \\
+\s*&& make -f .+ some-target
+Target 'some-target!!logged' took (?<duration>\d+)ms to complete.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+# the case when a target is timed and then logged, ie my-target!timed!!logged
+####################################################################################################
+
+function when_timed_then_logged {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=yes \
+       some-target!timed!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target!timed to .+
+exec .+ \\
+\s*&& trap .+ \\
+\s*&& exec .+ \\
+\s*&& make -f .+ some-target!timed
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+Target 'some-target' took (?<duration>\d+)ms to complete.
+make.+Leaving.+
+EOF
+
+    bmakelib.test.assert_matches $test_case_name \
+                                 $actual_logged_filename \
+                                 $expected_logged_pattern_filename \
+      || return 1
+}
+
+####################################################################################################
+
+test_cases=( when_logged_then_timed \
+               when_timed_then_logged )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in ${test_cases[@]}; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

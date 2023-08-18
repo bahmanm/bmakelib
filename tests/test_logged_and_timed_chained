@@ -99,7 +99,7 @@ EOF
   local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
   bmakelib.test.cat <<'EOF' > $expected_stdout_pattern_filename
 make.+Entering.+
-Logging target some-target to .+
+Logging target some-target!timed to .+
 exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\

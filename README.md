@@ -8,6 +8,25 @@ your Makefiles.
 The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read
 and maintain* Makefiles.
 
+## Example
+
+Makefile:
+
+```Makefile
+include bmakelib/bmakelib.mk
+
+my-target :
+	@sleep 2
+	@echo my-target is done
+```
+
+Shell:
+
+```
+$ make my-target!bmakelib.timed
+my-target is done
+Target 'my-target' took 2009ms to complete.
+```
 
 # How To Install
 

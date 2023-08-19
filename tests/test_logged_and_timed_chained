@@ -49,7 +49,7 @@ Logging target some-target to .+
 exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\
-\s*&& make -f .+ some-target
+\s*&& .*make -f .+ some-target
 Target 'some-target!!logged' took (?<duration>\d+)ms to complete.
 make.+Leaving.+
 EOF
@@ -103,7 +103,7 @@ Logging target some-target!timed to .+
 exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\
-\s*&& make -f .+ some-target!timed
+\s*&& .*make -f .+ some-target!timed
 make.+Leaving.+
 EOF
 

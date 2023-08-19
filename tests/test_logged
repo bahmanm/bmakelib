@@ -49,7 +49,7 @@ Logging target some-target to .+
 exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\
-\s*&& make -f .+ some-target
+\s*&& .*make -f .+ some-target
 make.+Leaving.+
 EOF
 
@@ -150,7 +150,7 @@ make.+Entering.+
 \s*exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\
-\s*&& make -f .+ some-target
+\s*&& .*make -f .+ some-target
 make.+Leaving.+
 EOF
 
@@ -256,7 +256,7 @@ Logging target target-to-log to .+
 \s*exec .+ \\
 \s*&& trap .+ \\
 \s*&& exec .+ \\
-\s*&& make -f .+ target-to-log
+\s*&& .*make -f .+ target-to-log
 Running some-target with explicitly logged prereq...
 make.+Leaving.+
 EOF

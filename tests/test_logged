@@ -29,7 +29,8 @@ function when_silent_is_no_and_echo_command_is_yes {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -82,7 +83,8 @@ function when_silent_is_no_and_echo_command_is_no {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -131,7 +133,8 @@ function when_silent_is_yes_and_echo_command_is_yes {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -183,7 +186,8 @@ function when_silent_is_yes_and_echo_command_is_no {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -231,7 +235,8 @@ function explicit_prerequisite {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : target-to-log
 

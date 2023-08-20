@@ -29,7 +29,8 @@ function when_logged_then_timed {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -83,7 +84,8 @@ function when_timed_then_logged {
   local actual_stdout_filename=${test_case_name}.actual.stdout.log
   bmakelib.test.cat <<EOF > Makefile
 export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 

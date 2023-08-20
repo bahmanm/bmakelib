@@ -28,7 +28,8 @@ function ok_emit_info_with_duration_implicit_prerequisite {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -58,7 +59,8 @@ function ok_emit_info_with_duration_explicit_prerequisite {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : do-some-target
 
@@ -92,7 +94,8 @@ function ok_no_additional_output_if_silent {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 
@@ -121,9 +124,9 @@ function ok_emit_info_when_convenience_target_is_disabled {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
 bmakelib.conf.timed.convenience-target := no
-
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : some-target
 

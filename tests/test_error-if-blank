@@ -28,7 +28,8 @@ function single_var_exit_when_blank {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-var1
 
@@ -58,7 +59,8 @@ function multi_var_exist_on_first_nonblank {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-vars
 
@@ -88,7 +90,8 @@ function ok_all_nonblank_vars {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-vars
 

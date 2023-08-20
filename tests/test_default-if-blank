@@ -28,7 +28,8 @@ function use_default_when_blank {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-var1
 
@@ -59,7 +60,8 @@ function ignore_default_when_nonblank {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-var1
 
@@ -90,7 +92,8 @@ function multiple_variable_value_pairs {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-vars
 
@@ -121,7 +124,8 @@ function emit_info_when_not_SILENT {
   local test_case_name=${FUNCNAME[0]}
   local actual_value_filename=${test_case_name}.actual.log
   bmakelib.test.cat <<EOF > Makefile
-include $( perl -E 'print $ENV{"bmakelib.ROOT"}' )/bmakelib.mk
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
 
 .PHONY : echo-vars
 

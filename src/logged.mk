@@ -144,11 +144,15 @@ bmakelib.conf.logged.ECHO_COMMAND ?= yes
 
 define bmakelib.logged._make-and-log-target
 
-$(let log-file,$(ROOT)$(1)-$(shell date +'%Y%m%d-%H%M%s-%N').logged,
-	$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
-		, \
-		$(info Logging target $(1) to $(log-file)))
-	$(call bmakelib.logged._logged-shell-command,$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(log-file)))
+$(let ts,$(shell perl -MTime::HiRes=time -MPOSIX \
+		-E '$$e = time(); $$m = ($$e - int($$e)) * 1e6;' \
+		-E 'print strftime("%Y%m%d-%H%M%S", localtime($$e)); printf(".%06.0f", $$m)'),
+	$(let log-file,$(ROOT)$(1)-$(ts).logged,
+		$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
+			, \
+			$(info Logging target $(1) to $(log-file)))
+		$(call bmakelib.logged._logged-shell-command, \
+			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(log-file))))
 
 endef
 

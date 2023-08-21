@@ -6,7 +6,7 @@ Log the output of a given target to file.
 
   * The name contains two consecutive exclamation marks (!!).  That is to denote that it runs a
     a new make process.
-  * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s-%N.logged` (a la `date` command.)
+  * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s.%µs.logged` (a la `date` command.)
 
 # Example 1
 

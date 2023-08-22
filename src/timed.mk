@@ -130,7 +130,7 @@ bmakelib.conf.timed.SILENT ?= no
 .NOTINTERMEDIATE : bmakelib._%!timed-pre
 
 bmakelib._%!timed-pre :
-	$(eval bmakelib.vars.timed.begin-ts.$(*) := $(shell date +%s%N))
+	$(eval bmakelib.vars.timed.begin-ts.$(*) := $(shell perl -MTime::HiRes=time -E 'printf("%.0f\n", int(time() * 1e9))'))
 
 ####################################################################################################
 #   Steps to take after executing the given target
@@ -140,7 +140,7 @@ bmakelib._%!timed-pre :
 .NOTINTERMEDIATE : bmakelib._%!timed-post
 
 bmakelib._%!timed-post :
-	$(eval bmakelib.vars.timed.end-ts.$(*) := $(shell date +%s%N))
+	$(eval bmakelib.vars.timed.end-ts.$(*) := $(shell perl -MTime::HiRes=time -E 'printf("%.0f\n", int(time() * 1e9))'))
 
 ####################################################################################################
 #   Execute the given target and measure the duration
@@ -151,4 +151,4 @@ bmakelib._%!timed-post :
 
 bmakelib._%!timed : bmakelib._%!timed-pre .WAIT % .WAIT bmakelib._%!timed-post
 	$(eval bmakelib.vars.timed.duration.$(*) := \
-		$(shell echo $$(( ($(bmakelib.vars.timed.end-ts.$(*)) - $(bmakelib.vars.timed.begin-ts.$(*))) / 1000000))))
+		$(shell perl -E 'printf("%.0f", ($(bmakelib.vars.timed.end-ts.$(*)) - $(bmakelib.vars.timed.begin-ts.$(*))) / 1_000_000)'))

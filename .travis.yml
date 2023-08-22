@@ -15,7 +15,10 @@ jobs:
         && sudo make install
         && popd
       script: >-
-        PATH="/usr/local/bin:$PATH" make test
+        export TMPDIR=$(mktemp -d)
+        && export PATH="/usr/local/bin:$PATH"
+        && make test
+        && make PREFIX=${TMPDIR}/ install
 
     - name: jammy (22.04)
       os: linux
@@ -29,7 +32,10 @@ jobs:
         && sudo make install
         && popd
       script: >-
-        PATH="/usr/local/bin:$PATH" make test
+        export TMPDIR=$(mktemp -d)
+        && export PATH="/usr/local/bin:$PATH"
+        && make test
+        && make PREFIX=${TMPDIR}/ install
 
     # Only run for the main branch.
     # Travis OSX jobs are 5x more expensive than Linux ones.
@@ -41,4 +47,7 @@ jobs:
       install: >-
         brew install make git bash
       script: >-
-        PATH="/usr/local/opt/make/libexec/gnubin:$PATH" make test
+        export TMPDIR=$(mktemp -d)
+        && export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+        && make test
+        && make PREFIX=${TMPDIR}/install

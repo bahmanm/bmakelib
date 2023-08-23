@@ -199,12 +199,11 @@ PREFIX ?= $(DESTDIR)/usr
 
 install : build
 install :
-	install -m u=rwx,g=rx,o=rx -d $(PREFIX)/include/$(NAME)
-	install -m u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME)
-	find $(BUILD)include -type f -exec install -m u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \;
-	install -m u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME)
-	find $(BUILD)doc -type f -name '*.md' \
-		-exec install -m u=rw,g=r,o=r {} $(PREFIX)/share/doc/$(NAME) \;
+	install -m u=rwx,g=rx,o=rx -d $(PREFIX)/include/$(NAME) \
+	&& install -m u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME) \
+	&& find $(BUILD)include -type f -exec install -m u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \; \
+	&& install -m u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME) \
+	&& find $(BUILD)doc -type f -name '*.md' -exec install -m u=rw,g=r,o=r {} $(PREFIX)/share/doc/$(NAME) \;
 
 ####################################################################################################
 

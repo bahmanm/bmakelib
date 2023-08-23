@@ -70,6 +70,15 @@ and install it using your faourite method, eg `rpm -i bmakelib-0.1.0-1.1.rpm`.
 Simply grab the prepackaged DEB from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
 and install it using your faourite method, eg `dpkg -i bmakelib_0.1.0-1_all.deb`.
 
+### Homebrew (MacOS and Linux)
+
+Assuming you have Homebrew configured, simply install bmakelib as below:
+```
+$ brew update
+$ brew tap bahmanm/bmakelib
+$ brew install bmakelib
+```
+
 ### Installing From Source
 
 Grab the source archive from the [release page](https://github.com/bahmanm/bmakelib/releases/latest), 

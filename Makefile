@@ -68,8 +68,8 @@ $(RPMBUILD) :
 package-rpm._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
 package-rpm._preprocess : $(RPMBUILD) $(RPMSPEC)
 package-rpm._preprocess :
-	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(RPMBUILD)SOURCES
-	perl -pi \
+	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(RPMBUILD)SOURCES \
+	&& perl -pi \
 		-E 's#(Version:\s*).+#$${1}$(VERSION)#;' \
 		-E 's#(Source0:\s*).+#$${1}$(NAME)-$(VERSION).tar.gz#;' \
 		$(RPMSPEC)
@@ -79,16 +79,16 @@ package-rpm._preprocess :
 .PHONY : package-rpm._run-rpmbuild-env
 
 package-rpm._run-rpmbuild-env :
-	docker build -t $(NAME)-rpmbuild-env - < $(ROOT)pkg/rpmbuild-env.Dockerfile
-	docker run --rm -v $(ROOT):/project $(NAME)-rpmbuild-env make package-rpm._build
+	docker build -t $(NAME)-rpmbuild-env - < $(ROOT)pkg/rpmbuild-env.Dockerfile \
+	&& docker run --rm -v $(ROOT):/project $(NAME)-rpmbuild-env make package-rpm._build
 
 ####################################################################################################
 
 .PHONY : package-rpm._build
 
 package-rpm._build :
-	rpmdev-bumpspec -r $(RPMSPEC)
-	rpmbuild \
+	rpmdev-bumpspec -r $(RPMSPEC) \
+	&& rpmbuild \
 		--define='_topdir $(RPMBUILD)' \
 		--define='source0 $(URL)/archive/refs/tags/v$(VERSION).tar.gz' \
 		-ba $(RPMSPEC)
@@ -120,10 +120,10 @@ $(DEBBUILD) :
 package-deb._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
 package-deb._preprocess : $(DEBBUILD)
 package-deb._preprocess :
-	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  # see debuild
-	tar -C $(DEBBUILD) -xzf $(DIST)$(NAME)-$(VERSION).tar.gz
-	cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION)
-	DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
+	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  \
+	&& tar -C $(DEBBUILD) -xzf $(DIST)$(NAME)-$(VERSION).tar.gz \
+	&& cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION) \
+	&& DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
 	USER=$$(git config user.name) \
 	EMAIL=$$(git config user.email) \
 	perl -pi \
@@ -139,8 +139,8 @@ package-deb._preprocess :
 .PHONY : package-deb._run-debbuild-env
 
 package-deb._run-debbuild-env :
-	docker build -t $(NAME)-debbuild-env - < $(ROOT)pkg/debbuild-env.Dockerfile
-	docker run --rm -v $(ROOT):/project $(NAME)-debbuild-env make package-deb._build
+	docker build -t $(NAME)-debbuild-env - < $(ROOT)pkg/debbuild-env.Dockerfile \
+	&& docker run --rm -v $(ROOT):/project $(NAME)-debbuild-env make package-deb._build
 
 ####################################################################################################
 
@@ -148,10 +148,10 @@ package-deb._run-debbuild-env :
 
 package-deb._build :
 	cd $(DEBBUILD)$(NAME)-$(VERSION) \
-		&& debuild \
-			--preserve-envvar=PATH \
-			--no-tgz-check \
-			-us -uc -F
+	&& debuild \
+		--preserve-envvar=PATH \
+		--no-tgz-check \
+		-us -uc -F
 
 ####################################################################################################
 
@@ -181,10 +181,10 @@ build : $(BUILD)
 build : test
 build : doc-update
 build :
-	mkdir -p $(BUILD)include
-	find src -type f \( -name '*.mk' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \;
-	mkdir -p $(BUILD)doc
-	cp \
+	mkdir -p $(BUILD)include \
+	&& find src -type f \( -name '*.mk' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \; \
+	&& mkdir -p $(BUILD)doc \
+	&& cp \
 		$(ROOT)LICENSE \
 		$(ROOT)src/VERSION \
 		$(ROOT)README.md \

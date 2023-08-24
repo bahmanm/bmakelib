@@ -1,7 +1,5 @@
 ---
 language: shell
-os: linux
-dist: focal
 services:
   - docker
 
@@ -87,7 +85,9 @@ jobs:
 
     - stage: deploy
 
-      name: Create github release
+    - name: Create github release
+      os: linux
+      dist: focal
       before_deploy: >-
         [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION);
         cd dist

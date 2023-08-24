@@ -1,9 +1,13 @@
 ---
-language: minimal
+language: shell
+
+os: linux
+dist: xenial
 
 services:
   - docker
 
+####################################################################################################
 jobs:
 
   exclude:
@@ -11,7 +15,7 @@ jobs:
 
   include:
 
-    ####################################################################################################
+    ################################################################################################
 
     - stage: test
 
@@ -64,7 +68,7 @@ jobs:
         && make test
         && make PREFIX=${TMPDIR}/install
 
-    ####################################################################################################
+    ################################################################################################
 
     - stage: build
 
@@ -82,21 +86,26 @@ jobs:
       script: >-
         make package-rpm package-deb
 
-    ####################################################################################################
+    ################################################################################################
 
     - stage: deploy
 
     - name: Create github release
-      provider: releases
-      draft: true
-      skip_cleanup: true
-      overwrite: true
-      on:
-        tags: true
-      api_key:
-        secure: pLXYgYpoar8/Hfpi8o0PCC1eSzXgY+UkjrOAyy2hiLBmZpO38ZM465mJfv4jiz9ZEsdc9j2X88bVukTvhaC8Gn7VWhDyaCuE5tbosv72HRGH+Y0reYHcsMGz0MczMSo4Q8zGhiUco2H4b3Xz+z+vxUmxWeTL4WYHrOk1C75AxTB8FHJWK7URgKcDm/YEK2nLGMJGrO8qwWkoY5V3Vp3Y+t2YlxHIoAT/pbzAizwM9lw/068fsE+0muSG2AhB1s7Co2AMWWWDJsKMMUF7TC6WB+kdaD7077A7NnU2P7g1YThvRq/A6qDzpIEm9ba69Cn83yhM+PWn1vi/mqkdelCvSk3kFTOBBC3IzozVKofrZJ/+d8suw7zz7oMoaG1DY/MERhJzfoduIOORzNFoQSHoLa56ux3fiWXs8Ji8lE5ClnZAgBF24VXBxRq/T/fp/OOuIJVszztatGPLNS4vvPIb9oIOVtjOFZ8SYcNkUOvxhvXcQ+x7/Pq1T4FAQV1Un6iIx1sn8mDTr/UL8VL5nVr3Rj4ff6tP+BWMUVfzYvudeAVdDvqpO0csgQduulXOFW7I/WgmVHx8Jtl87eVJJg2S3pP1QbfxO+QQv5nHx4yAA8XreOpfJHXD7uOzINQqUc5BZA9aog7tLbjp4hY2ogkwrJGtIj7BI2NkfbEWEWBDSCM=
-
-      file:
-        - dist/bmakelib-${BMAKELIB_VERSION}.tar.gz
-        - dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm
-        - dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb
+      os: linux
+      dist: focal
+      before_deploy: >-
+        [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION);
+      deploy:
+        provider: releases
+        draft: true
+        cleanup: false
+        overwrite: true
+        on:
+          tags: true
+        token:
+          secure: 'pLXYgYpoar8/Hfpi8o0PCC1eSzXgY+UkjrOAyy2hiLBmZpO38ZM465mJfv4jiz9ZEsdc9j2X88bVukTvhaC8Gn7VWhDyaCuE5tbosv72HRGH+Y0reYHcsMGz0MczMSo4Q8zGhiUco2H4b3Xz+z+vxUmxWeTL4WYHrOk1C75AxTB8FHJWK7URgKcDm/YEK2nLGMJGrO8qwWkoY5V3Vp3Y+t2YlxHIoAT/pbzAizwM9lw/068fsE+0muSG2AhB1s7Co2AMWWWDJsKMMUF7TC6WB+kdaD7077A7NnU2P7g1YThvRq/A6qDzpIEm9ba69Cn83yhM+PWn1vi/mqkdelCvSk3kFTOBBC3IzozVKofrZJ/+d8suw7zz7oMoaG1DY/MERhJzfoduIOORzNFoQSHoLa56ux3fiWXs8Ji8lE5ClnZAgBF24VXBxRq/T/fp/OOuIJVszztatGPLNS4vvPIb9oIOVtjOFZ8SYcNkUOvxhvXcQ+x7/Pq1T4FAQV1Un6iIx1sn8mDTr/UL8VL5nVr3Rj4ff6tP+BWMUVfzYvudeAVdDvqpO0csgQduulXOFW7I/WgmVHx8Jtl87eVJJg2S3pP1QbfxO+QQv5nHx4yAA8XreOpfJHXD7uOzINQqUc5BZA9aog7tLbjp4hY2ogkwrJGtIj7BI2NkfbEWEWBDSCM='
+        file_glob: true
+        file:
+          - 'dist/bmakelib-${BMAKELIB_VERSION}.tar.gz'
+          - 'dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm'
+          - 'dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb'

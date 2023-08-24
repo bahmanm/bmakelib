@@ -1,9 +1,21 @@
 ---
 language: minimal
 
+services:
+  - docker
+
 jobs:
+
+  exclude:
+    - dist: xenial
+
   include:
-    - name: focal (20.04)
+
+    ####################################################################################################
+
+    - stage: test
+
+    - name: Focal (20.04)
       os: linux
       dist: focal
       install: >-
@@ -20,7 +32,7 @@ jobs:
         && make test
         && make PREFIX=${TMPDIR}/ install
 
-    - name: jammy (22.04)
+    - name: Jammy (22.04)
       os: linux
       dist: jammy
       install: >-
@@ -39,7 +51,7 @@ jobs:
 
     # Only run for the main branch.
     # Travis OSX jobs are 5x more expensive than Linux ones.
-    - name: osx xcode12
+    - name: OSX (xcode 12)
       if: commit_message =~ /build\!osx/
       os: osx
       osx_image: xcode12
@@ -51,3 +63,43 @@ jobs:
         && export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
         && make test
         && make PREFIX=${TMPDIR}/install
+
+    ####################################################################################################
+
+    - stage: build
+
+    - name: Build DEB and RPM packages
+      os: linux
+      dist: jammy
+      install: >-
+        pushd /tmp
+        && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+        && tar xzf make-4.4.1.tar.gz
+        && cd make-4.4.1
+        && ./configure --prefix=/usr/local
+        && sudo make install
+        && popd
+      script: >-
+        make package-rpm package-deb
+
+    ####################################################################################################
+
+    - stage: deploy
+
+    - name: Create github release
+      provider: releases
+      draft: true
+      skip_cleanup: true
+      overwrite: true
+      on.tags: false
+      api_key.secure: pLXYgYpoar8/Hfpi8o0PCC1eSzXgY+UkjrOAyy2hiLBmZpO38ZM465mJfv4jiz9ZEsdc9j2X88bVukTvhaC8Gn7VWhDyaCuE5tbosv72HRGH+Y0reYHcsMGz0MczMSo4Q8zGhiUco2H4b3Xz+z+vxUmxWeTL4WYHrOk1C75AxTB8FHJWK7URgKcDm/YEK2nLGMJGrO8qwWkoY5V3Vp3Y+t2YlxHIoAT/pbzAizwM9lw/068fsE+0muSG2AhB1s7Co2AMWWWDJsKMMUF7TC6WB+kdaD7077A7NnU2P7g1YThvRq/A6qDzpIEm9ba69Cn83yhM+PWn1vi/mqkdelCvSk3kFTOBBC3IzozVKofrZJ/+d8suw7zz7oMoaG1DY/MERhJzfoduIOORzNFoQSHoLa56ux3fiWXs8Ji8lE5ClnZAgBF24VXBxRq/T/fp/OOuIJVszztatGPLNS4vvPIb9oIOVtjOFZ8SYcNkUOvxhvXcQ+x7/Pq1T4FAQV1Un6iIx1sn8mDTr/UL8VL5nVr3Rj4ff6tP+BWMUVfzYvudeAVdDvqpO0csgQduulXOFW7I/WgmVHx8Jtl87eVJJg2S3pP1QbfxO+QQv5nHx4yAA8XreOpfJHXD7uOzINQqUc5BZA9aog7tLbjp4hY2ogkwrJGtIj7BI2NkfbEWEWBDSCM=
+
+      before_deploy: >-
+        [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION);
+        [[ -z "$TRAVIS_TAG" ]] && export TRAVIS_TAG="v${BMAKELIB_VERSION}";
+        git tag -f $TRAVIS_TAG
+
+      file:
+        - dist/bmakelib-${BMAKELIB_VERSION}.tar.gz
+        - dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm
+        - dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb

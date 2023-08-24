@@ -1,12 +1,18 @@
 ---
 language: minimal
+
 services:
   - docker
 
 jobs:
+
+  exclude:
+    - dist: xenial
+
   include:
 
     ####################################################################################################
+
     - stage: test
 
     - name: focal (20.04)
@@ -58,8 +64,8 @@ jobs:
         && make test
         && make PREFIX=${TMPDIR}/install
 
-
     ####################################################################################################
+
     - stage: build
 
     - name: build

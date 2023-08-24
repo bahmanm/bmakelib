@@ -86,7 +86,6 @@ jobs:
 
     - stage: deploy
 
-    - name: Create a github release
       provider: releases
       draft: true
       skip_cleanup: true

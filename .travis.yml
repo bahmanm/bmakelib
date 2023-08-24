@@ -94,7 +94,7 @@ jobs:
       os: linux
       dist: focal
       before_deploy: >-
-        [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION);
+        [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION)";
       deploy:
         provider: releases
         draft: true

@@ -1,8 +1,14 @@
 ---
 language: minimal
+services:
+  - docker
 
 jobs:
   include:
+
+    ####################################################################################################
+    - stage: test
+
     - name: focal (20.04)
       os: linux
       dist: focal
@@ -51,3 +57,21 @@ jobs:
         && export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
         && make test
         && make PREFIX=${TMPDIR}/install
+
+
+    ####################################################################################################
+    - stage: build
+
+    - name: build
+      os: linux
+      dist: jammy
+      install: >-
+        pushd /tmp
+        && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+        && tar xzf make-4.4.1.tar.gz
+        && cd make-4.4.1
+        && ./configure --prefix=/usr/local
+        && sudo make install
+        && popd
+      script: >-
+        make package-rpm package-deb

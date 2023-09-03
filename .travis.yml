@@ -82,7 +82,7 @@ jobs:
       deploy:
         provider: releases
         draft: true
-        cleanup: false
+        skip_cleanup: true
         overwrite: true
         on:
           tags: true

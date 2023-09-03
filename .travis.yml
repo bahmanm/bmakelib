@@ -63,7 +63,7 @@ jobs:
       name: build & deploy
       os: linux
       dist: focal
-      if: (branch = master) OR (tag = true) OR (commit_message =~ /\!build/)
+      if: (branch = master) OR (tag IS present) OR (commit_message =~ /\!build/)
       script: >-
         make package-rpm package-deb
       before_deploy: >-

@@ -43,7 +43,7 @@ jobs:
     # Only run for the main branch.
     # Travis OSX jobs are 5x more expensive than Linux ones.
     - name: OSX (xcode 12)
-      if: commit_message =~ /build\!osx/
+      if: commit_message =~ /test\!osx/
       os: osx
       osx_image: xcode12
       before_install: brew update
@@ -57,32 +57,21 @@ jobs:
 
     ################################################################################################
 
-    - stage: build
+    - stage: build & deploy
 
     - <<: *linux
-      name: Build DEB and RPM packages
+      name: build & deploy
       os: linux
       dist: focal
+      if: (branch = master) OR (tag = true) OR (commit_message =~ /\!build/)
       script: >-
         make package-rpm package-deb
-
-    ################################################################################################
-
-    - stage: deploy
-
-    - name: Create github release
-      os: linux
-      dist: focal
       before_deploy: >-
         [[ -z ${BMAKELIB_VERSION} ]] && export BMAKELIB_VERSION=$(<src/VERSION)
-        ; pwd
-        ; ls -alh
-        ; ls -alh ${HOME}/builds/**
-        ; ls -alh ${TRAVIS_BUILD_DIR}/**
       deploy:
         provider: releases
         draft: true
-        skip_cleanup: true
+        cleanup: false
         overwrite: true
         on:
           tags: true

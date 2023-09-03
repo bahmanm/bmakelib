@@ -75,8 +75,10 @@ jobs:
       dist: focal
       before_deploy: >-
         [[ -z ${BMAKELIB_VERSION} ]] && export BMAKELIB_VERSION=$(<src/VERSION)
-        ; cd ${HOME}
+        ; pwd
         ; ls -alh
+        ; ls -alh ${HOME}/builds/**
+        ; ls -alh ${TRAVIS_BUILD_DIR}/**
       deploy:
         provider: releases
         draft: true

@@ -64,7 +64,7 @@ jobs:
     - <<: *linux
       name: Build DEB and RPM packages
       os: linux
-      dist: jammy
+      dist: focal
       script: >-
         make package-rpm package-deb
 
@@ -74,7 +74,7 @@ jobs:
 
     - name: Create github release
       os: linux
-      dist: jammy
+      dist: focal
       before_deploy: >-
         [[ -z "$BMAKELIB_VERSION" ]] && export BMAKELIB_VERSION="$(<src/VERSION)"
       deploy:

@@ -60,6 +60,7 @@ jobs:
 
     - <<: *linux
       name: Build & Release
+      if: (branch = master) OR (commit_message =~ /\!build/)
       dist: focal
       script: >-
         make package-rpm package-deb

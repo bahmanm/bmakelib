@@ -75,7 +75,7 @@ jobs:
 
     - <<: *linux
       name: Build & Release
-      if: (branch = main) OR (tag IS present) OR (commit_message =~ /\!build/)
+      if: (tag IS present) OR (commit_message =~ /\!build/)
       dist: focal
       script: >-
         make package-rpm package-deb
@@ -93,6 +93,6 @@ jobs:
           secure: "ilFr/G75yFMYV5tNDEbt9xtGWoB1tWZdYh4oiGpx20TxK283NW3MJ/cZxQLTs1fBRe8DYRLiAzYdTfdLzjtKyCUfKkTaBCOIs4kKRphd3Od4iNI42AgA6hyT8edeCsyDd0uTui+ZDi7Z2rGCW29PDvWh67GZ31ksTl5bWj+gWtU0Hc+KnBBFGQ+N9U1aC1l7SYnKnGzPrtguoEDKBVoA5lURLc/dmoA51ACV921lJwSALsHwTqSVpW5cS+1xnTOXaFDsm6ebjG8mygzLBv6D54/GnYnpEBt+NhoXtHRP2Q+fWLqlxEDyj8xP8/eE5o/okl1LMz1d8fthYHh6duBT0O8GL6TMlMZAJClTYMPuFbLSyNkHynHjdztGZHZPsTX8zJoizPNVbZE+pr5eydaY6y6Uzp0wJGxb+dNrGfuc0EaPGHb904i32PqSb/AeAFrVHUXTvFlu8zIURe5AcegthCZUAULzAxLcpMX31/yicbNyKph4q7MktzWsYWJ8wuAsCjOLS9yaSkQM7jbTzsG+Xaz2KrQtL52//pLMCYzMPHOxrrtRiCVEhRmQ5K4Z8020yfYPEzOSedZHN1ySIvhLgoCEWRETA9/PGXTa+1JthHNjkciO5e3FPyYu+Lze1UGYO4S4JEwMpH50tJber1sm3PYuYUu5W6EQBL4ORns9b/s="
         file_glob: true
         file:
-          - "dist/bmakelib-${BMAKELIB_VERSION}.tar.gz"
-          - "dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm"
-          - "dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb"
+          - "dist/bmakelib-*.tar.gz"
+          - "dist/bmakelib-*.noarch.rpm"
+          - "dist/bmakelib_*_all.deb"

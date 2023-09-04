@@ -79,10 +79,9 @@ jobs:
       dist: focal
       script: >-
         make package-rpm package-deb
-      after_script: >-
-        sudo chown -R ${USER} _build
       before_deploy: >-
         [[ -z ${BMAKELIB_VERSION} ]] && export BMAKELIB_VERSION=$(<src/VERSION)
+        ; sudo chown -R ${USER} _build
       deploy:
         provider: releases
         draft: true

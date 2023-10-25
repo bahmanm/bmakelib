@@ -68,8 +68,6 @@
 #<
 ####################################################################################################
 
-.PHONY : bmakelib.default-if-blank(%)
-
 bmakelib.default-if-blank(%) :
 	$(let _varname _varval _rest, \
 		$(subst $(bmakelib.comma), ,$(*)), \

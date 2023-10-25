@@ -64,8 +64,6 @@
 #<
 ####################################################################################################
 
-.PHONY : %!bmakelib.timed
-
 %!bmakelib.timed : bmakelib.default-if-blank( bmakelib.conf.timed.SILENT,no ) bmakelib._%!timed
 	$(if $(filter yes,$(bmakelib.conf.timed.SILENT)), \
 	     , \
@@ -106,8 +104,6 @@ bmakelib.conf.timed.convenience-target ?= yes
 
 ifneq ($(bmakelib.conf.timed.convenience-target),no)
 
-.PHONY : %!timed
-
 %!timed : %!bmakelib.timed ;
 
 endif
@@ -126,7 +122,6 @@ bmakelib.conf.timed.SILENT ?= no
 #   Steps to take before executing the given target
 ####################################################################################################
 
-.PHONY : bmakelib._%!timed-pre
 .NOTINTERMEDIATE : bmakelib._%!timed-pre
 
 bmakelib._%!timed-pre :
@@ -136,7 +131,6 @@ bmakelib._%!timed-pre :
 #   Steps to take after executing the given target
 ####################################################################################################
 
-.PHONY : bmakelib._%!timed-post
 .NOTINTERMEDIATE : bmakelib._%!timed-post
 
 bmakelib._%!timed-post :
@@ -146,7 +140,6 @@ bmakelib._%!timed-post :
 #   Execute the given target and measure the duration
 ####################################################################################################
 
-.PHONY : bmakelib._%!timed
 .NOTINTERMEDIATE : bmakelib._%!timed
 
 bmakelib._%!timed : bmakelib._%!timed-pre .WAIT % .WAIT bmakelib._%!timed-post

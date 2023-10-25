@@ -68,8 +68,6 @@
 #<
 ####################################################################################################
 
-.PHONY : %!!bmakelib.logged
-
 %!!bmakelib.logged : bmakelib.error-if-blank( ROOT )
 	$(call bmakelib.logged._make-and-log-target,$(*))
 
@@ -108,8 +106,6 @@ bmakelib.conf.logged.convenience-target ?= yes
 ####################################################################################################
 
 ifneq ($(bmakelib.conf.logged.convenience-target),no)
-
-.PHONY : %!!logged
 
 %!!logged : %!!bmakelib.logged ;
 

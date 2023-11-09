@@ -88,7 +88,7 @@ bmakelib.octospace := $(subst ,        ,)
 
 # Abort
 $(error \
-Incompatible Make version.$(bmakelib.newline)\
+❌ Incompatible Make version.$(bmakelib.newline)\
 The minimum Make version supported by bmakelib is $(bmakelib.MIN_MAKE_VERSION) while you are $(bmakelib.newline)\
 running $(MAKE_VERSION).$(bmakelib.newline)$(bmakelib.newline)\
 \

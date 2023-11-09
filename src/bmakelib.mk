@@ -108,13 +108,16 @@ $(bmakelib.octospace)&& sudo make install$(bmakelib.newline)$(bmakelib.newline))
 endif
 
 ####################################################################################################
-#   If it's a supported Make version, include the rest of the bmakelib suite.
+#   If it's a supported Make version, include the rest of bmakelib suite.
 ####################################################################################################
 
 export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
 
-include $(bmakelib.ROOT)error-if-blank.mk
-include $(bmakelib.ROOT)default-if-blank.mk
-include $(bmakelib.ROOT)timed.mk
-include $(bmakelib.ROOT)logged.mk
+####################################################################################################
+
+bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk
+
+.PHONY : $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
+
+include $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)

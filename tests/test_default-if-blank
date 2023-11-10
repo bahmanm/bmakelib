@@ -53,6 +53,38 @@ EOF
 }
 
 ####################################################################################################
+# when a variable is set to blank on the command line, it should use the provided default
+####################################################################################################
+
+function use_default_when_blank_passed_on_command_line {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-var1
+
+echo-var1 : bmakelib.default-if-blank( VAR1,v1 )
+echo-var1 :
+	echo \$(VAR1)
+EOF
+
+  make VAR1= echo-var1 > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+echo v1
+v1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 # when a variable is not blank, ignore the default value provided
 ####################################################################################################
 
@@ -154,10 +186,11 @@ EOF
 
 ####################################################################################################
 
-test_cases=( use_default_when_blank \
-               ignore_default_when_nonblank \
-               multiple_variable_value_pairs \
-               emit_info_when_not_SILENT )
+test_cases=( use_default_when_blank
+             use_default_when_blank_passed_on_command_line
+             ignore_default_when_nonblank
+             multiple_variable_value_pairs
+             emit_info_when_not_SILENT )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

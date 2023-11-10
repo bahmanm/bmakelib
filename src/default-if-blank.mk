@@ -76,7 +76,7 @@ bmakelib.default-if-blank(%) :
 			$(if $(filter yes,$(bmakelib.conf.default-if-blank.SILENT)), \
 				, \
 				$(info Using default value '$(_varval)' for variable '$(_varname)')) \
-			$(eval $(_varname) := $(_varval))))
+			$(eval override $(_varname) := $(_varval))))
 
 ####################################################################################################
 #>

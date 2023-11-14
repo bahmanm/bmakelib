@@ -1,0 +1,288 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © 2023 Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# Using enum and error-if-blank, when the variable is blank
+####################################################################################################
+
+function enum_with_error_if_blank_when_variable_is_blank {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+VAR1 ?=
+
+.PHONY : a-target
+a-target : bmakelib.error-if-blank( VAR1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make VAR1= a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+Provide a value for 'VAR1'.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and error-if-blank, when the variable is not blank and is not a member of the enum
+####################################################################################################
+
+function enum_with_error_if_blank_when_variable_is_not_blank_and_is_not_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+VAR1 ?=
+
+.PHONY : a-target
+a-target : bmakelib.error-if-blank( VAR1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make VAR1=not-exists a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\* 'not-exists' is not a member of enum 'ENUM1'.  Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and error-if-blank, when the variable is not blank and is a member of the enum
+####################################################################################################
+
+function enum_with_error_if_blank_when_variable_is_not_blank_and_is_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+VAR1 ?=
+
+.PHONY : a-target
+a-target : bmakelib.error-if-blank( VAR1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make VAR1=v1 a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+v1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and default-if-blank, when the variable is blank and default is a member of the enum
+####################################################################################################
+
+function enum_with_default_if_blank_when_variable_is_blank_and_default_is_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+.PHONY : a-target
+a-target : bmakelib.default-if-blank( VAR1,v1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+v1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and default-if-blank, when the variable is blank and default is not a member of the
+# enum
+####################################################################################################
+
+function enum_with_default_if_blank_when_variable_is_blank_and_default_is_not_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+.PHONY : a-target
+a-target : bmakelib.default-if-blank( VAR1,not-exists )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\* 'not-exists' is not a member of enum 'ENUM1'.  Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and default-if-blank, when the variable is not blank and is a member of the enum
+####################################################################################################
+
+function enum_with_default_if_blank_when_variable_is_not_blank_and_is_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+.PHONY : a-target
+a-target : bmakelib.default-if-blank( VAR1,v1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make VAR1=v2 a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+v2
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Using enum and default-if-blank, when the variable is blank and default is not a member of the
+# enum
+####################################################################################################
+
+function enum_with_default_if_blank_when_variable_is_not_blank_and_is_not_member {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+define-enum : bmakelib.enum.define( ENUM1/v1,v2 )
+include define-enum
+
+.PHONY : a-target
+a-target : bmakelib.default-if-blank( VAR1,v1 )
+a-target : bmakelib.enum.error-unless-member( ENUM1,VAR1 )
+a-target :
+	@echo \$(VAR1)
+EOF
+
+  make VAR1=not-exists a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\* 'not-exists' is not a member of enum 'ENUM1'.  Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+
+test_cases=( enum_with_error_if_blank_when_variable_is_blank
+             enum_with_error_if_blank_when_variable_is_not_blank_and_is_not_member
+             enum_with_error_if_blank_when_variable_is_not_blank_and_is_member
+             enum_with_default_if_blank_when_variable_is_blank_and_default_is_member
+             enum_with_default_if_blank_when_variable_is_blank_and_default_is_not_member
+             enum_with_default_if_blank_when_variable_is_not_blank_and_is_member
+             enum_with_default_if_blank_when_variable_is_not_blank_and_is_not_member )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in ${test_cases[@]}; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

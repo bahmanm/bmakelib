@@ -45,9 +45,17 @@ endef
 #<
 ####################################################################################################
 
-define bmakelib.comma :=
-,
-endef
+bmakelib.comma := ,
+
+####################################################################################################
+#>
+#   # `bmakelib.slash`
+#
+#   Expands to a slash (/)
+#<
+####################################################################################################
+
+bmakelib.slash := /
 
 ####################################################################################################
 #>
@@ -60,6 +68,16 @@ endef
 bmakelib.backslash := $(subst ,\,)
 
 ####################################################################################################
+#>
+#   # `bmakelib.space`
+#
+#   Expands to a whitespace
+#<
+####################################################################################################
+
+bmakelib.space := $(subst , ,)
+
+####################################################################################################
 #   Abort with, hopefully, an informative message if it's an unsupported Make version.
 ####################################################################################################
 
@@ -70,7 +88,7 @@ bmakelib.octospace := $(subst ,        ,)
 
 # Abort
 $(error \
-Incompatible Make version.$(bmakelib.newline)\
+❌ Incompatible Make version.$(bmakelib.newline)\
 The minimum Make version supported by bmakelib is $(bmakelib.MIN_MAKE_VERSION) while you are $(bmakelib.newline)\
 running $(MAKE_VERSION).$(bmakelib.newline)$(bmakelib.newline)\
 \
@@ -90,13 +108,16 @@ $(bmakelib.octospace)&& sudo make install$(bmakelib.newline)$(bmakelib.newline))
 endif
 
 ####################################################################################################
-#   If it's a supported Make version, include the rest of the bmakelib suite.
+#   If it's a supported Make version, include the rest of bmakelib suite.
 ####################################################################################################
 
 export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
 
-include $(bmakelib.ROOT)error-if-blank.mk
-include $(bmakelib.ROOT)default-if-blank.mk
-include $(bmakelib.ROOT)timed.mk
-include $(bmakelib.ROOT)logged.mk
+####################################################################################################
+
+bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk
+
+.PHONY : $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
+
+include $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)

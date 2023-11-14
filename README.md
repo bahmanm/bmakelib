@@ -28,6 +28,15 @@ my-target is done
 Target 'my-target' took 2009ms to complete.
 ```
 
+# bmakelib Contents
+
+* [bmakelib.mk](doc/bmakelib.md)
+* [error-if-blank.mk](doc/error-if-blank.md)
+* [default-if-blank.mk](doc/error-if-blank.md)
+* [timed.mk](doc/timed.md)
+* [logged.mk](doc/logged.md)
+* [enum.mk](doc/enum.md)
+
 # How To Install
 
 ## Prerequisites
@@ -163,10 +172,3 @@ $ make my-target
 *** Provide value for 'IMPORTANT_OPTION.  Stop.
 ```
 
-# bmakelib Contents
-
-* [bmakelib.mk](doc/bmakelib.md)
-* [error-if-blank.mk](doc/error-if-blank.md)
-* [default-if-blank.mk](doc/error-if-blank.md)
-* [timed.mk](doc/timed.md)
-* [logged.mk](doc/logged.md)

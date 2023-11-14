@@ -17,9 +17,21 @@ Expands to a comma (,)
 
 ---
 
+# `bmakelib.slash`
+
+Expands to a slash (/)
+
+---
+
 # `bmakelib.backslash`
 
 Expands to a backslash (\)
+
+---
+
+# `bmakelib.space`
+
+Expands to a whitespace
 
 ---
 

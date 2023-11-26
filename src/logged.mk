@@ -15,56 +15,59 @@
 
 ####################################################################################################
 #>
-#   # `%!!bmakelib.logged`
+#   # `!!bmakelib.logged`
 #
-#   Log the output of a given target to file.
+#   Logs the output of a given target to file.
 #
-#   # Notes
-#
-#     * The name contains two consecutive exclamation marks (!!).  That is to denote that it runs a
-#       a new make process.
-#     * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s.%µs.logged` (a la `date` command.)
-#
-#   # Example 1
+#   ### Example 1
 #
 #   Makefile:
 #
 #	```Makefile
 #	some-target :
-#		@echo Running some-target...
+#		@echo ✅ some-target is done!
 #	```
 #
 #   Shell:
 #
-#	```
+#	```text
 #	$ make my-target!!bmakelib.logged
 #	Logging target some-target to some-target-20230808-16221691536940-884103049.logged
 #	exec 3>&1 4>&2 \
 #	&& trap 'exec 2>&4 1>&3' 0 1 2 3 \
 #	&& exec 1>/tmp/tmp.37mr7DpGnn/test_logged/some-target-20230808-16221691536940-884103049.logged 2>&1 \
 #	&& make -f Makefile some-target
+#
 #	$ cat some-target-20230808-16221691536940-884103049.logged
-#	Running some-target...
+#	✅ some-target is done!
 #	```
 #
-#   # Example 2
+#   ### Example 2
 #
 #   Makefile:
 #
 #	```Makefile
 #	some-target :
-#		@echo Running some-target...
+#		@echo 🤖 Done this and that.
 #	```
 #
 #   Shell:
 #
-#	```
+#	```text
 #	$ make bmakelib.conf.logged.SILENT=yes \
 #	       bmakelib.conf.logged.ECHO_COMMAND=no \
 #	       some-target!!bmakelib.logged
+#
 #	$ cat some-target-20230808-16221691536940-834199518.logged
-#	Running some-target...
+#	🤖 Done this and that.
 #	```
+#
+#   ### Notes
+#
+#     * See `!!logged` below for a shorter name.
+#     * The name contains two consecutive exclamation marks (`!!`).  That is to denote that it runs a
+#       a new make process.
+#     * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s.%µs.logged` (a la `date` command.)
 #<
 ####################################################################################################
 
@@ -84,10 +87,10 @@ bmakelib.conf.logged.convenience-target ?= yes
 
 ####################################################################################################
 #>
-#   # `%!!logged`
+#   # `!!logged`
 #
 #   Convenience target with a shorter and more intuitive name.  It's a drop-in replacement for
-#   `%!!bmakelib.logged`.
+#   `!!bmakelib.logged`.
 #
 #   Lets you write
 #
@@ -115,7 +118,7 @@ endif
 #>
 #   # `bmakelib.conf.logged.SILENT`
 #
-#   If set to yes, causes `%!!bmakelib.logged` to emit an info containing the log filename.
+#   If set to yes, causes `!!bmakelib.logged` to emit an info containing the log filename.
 #<
 ####################################################################################################
 
@@ -125,7 +128,7 @@ bmakelib.conf.logged.SILENT ?= no
 #>
 #   # `bmakelib.conf.logged.ECHO_COMMAND`
 #
-#   If set to no, causes `%!!bmakelib.logged` to not echo the actual command it runs.
+#   If set to no, causes `!!bmakelib.logged` to not echo the actual command it runs.
 #<
 ####################################################################################################
 

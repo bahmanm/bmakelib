@@ -15,21 +15,22 @@
 
 ####################################################################################################
 #>
-#   # `bmakelib.enum.define(%)`
+#   # `bmakelib.enum.define`
 #
-#   Define an enum (aka variant or option.)
+#   Defines an enum (aka variant or option.)
+#
 #   It can later be used to verify the value of variables by using
 #   `bmakelib.enum.error-unless-member`.
 #
-#   ## Example 1
+#   ### Example 1
 #
 #   Makefile:
 #
-#       ```Makefile
-#       define-enums : bmakelib.enum.define( DaysOfWeek/SUN,MON,TUE,WED,THU,FRI,SAT )
-#       define-enums : bmakelib.enum.define( DISTRO/openSUSE,Debian,Fedora)
-#       include define-enums
-#       ```
+#	```Makefile
+#	define-enums : bmakelib.enum.define( DaysOfWeek/SUN,MON,TUE,WED,THU,FRI,SAT )
+#	define-enums : bmakelib.enum.define( DISTRO/openSUSE,Debian,Fedora)
+#	include define-enums
+#	```
 #
 #   The above makefile defines two enums:
 #
@@ -40,19 +41,20 @@
 #   evaluated before any other targets.  We're using this technic to ensure the enums are defined
 #   before we access them._
 #
-#   ## Example 2
+#   ### Example 2
 #
 #   Makefile:
 #
-#       ```Makefile
-#       publish-package : bmakelib.enum.define( PKG-TYPE/deb,rpm,aur)
+#	```Makefile
+#	publish-package : bmakelib.enum.define( PKG-TYPE/deb,rpm,aur)
 #	publish-package :
 #		...
 #	```
 #
-#   The above snippet defines an enum `PKG-TYPE` with 3 possible values `deb`, `rpm` and `aur`.  The
-#   difference with the method used in example 1 is that `PKG-TYPE` is not going to be accessible
-#   before `publish-package` is invoked.
+#   The above snippet defines an enum `PKG-TYPE` with 3 possible values `deb`, `rpm` and `aur`.
+#
+#   _The difference with the method used in example 1 is that `PKG-TYPE` would not be accessible
+#   before `publish-package` is invoked._
 #<
 ####################################################################################################
 
@@ -65,32 +67,32 @@ bmakelib.enum.define(%) :
 
 ####################################################################################################
 #>
-#   # `bmakelib.enum.error-unless-member(%)`
+#   # `bmakelib.enum.error-unless-member`
 #
-#   Verifies if a value is a member of a given enum and aborts make in case if it's not.
+#   Verifies if a variable's value is a member of a given enum and aborts make in case it's not.
 #
-#   ## Example
+#   ### Example
 #
 #   Makefile:
 #
-#       ```Makefile
-#	define-enum : bmakelib.enum.define( DEPLOY-ENV/testing,development,staging,production )
+#	```Makefile
+#	define-enum : bmakelib.enum.define( DEPLOY-ENV/development,staging,production )
 #	include define-enum
 #
-#       deploy : bmakelib.enum.error-unless-member( DEPLOY-ENV,ENV )
+#	deploy : bmakelib.enum.error-unless-member( DEPLOY-ENV,ENV )
 #	deploy :
-#		@echo Deploying to $(ENV)...
+#		@echo 🚀 Deploying to $(ENV)...
 #	```
 #
 #   Shell:
 #
-#	```
+#	```text
 #	$ make ENV=local-laptop deploy
 #	*** 'local-laptop' is not a member of enum 'DEPLOY-ENV'.  Stop.
 #
-#       $ make ENV=production deploy
-# 	Deploying to production...
-#
+#	$ make ENV=production deploy
+#	🚀 Deploying to production...
+#	```
 #<
 ####################################################################################################
 

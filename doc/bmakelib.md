@@ -1,6 +1,7 @@
 # `bmakelib.MIN_MAKE_VERSION`
 
 Minimum Make version supported.
+
 Anything older either breaks bmakelib or can cause it to behave in unexpected ways.
 
 ---

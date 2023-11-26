@@ -18,6 +18,7 @@
 #   # `bmakelib.MIN_MAKE_VERSION`
 #
 #   Minimum Make version supported.
+#
 #   Anything older either breaks bmakelib or can cause it to behave in unexpected ways.
 #<
 ####################################################################################################
@@ -95,8 +96,8 @@ running $(MAKE_VERSION).$(bmakelib.newline)$(bmakelib.newline)\
 bmakelib has aborted the make process in order to avoid unexpected$(bmakelib.newline)\
 behaviours and hard to find bugs.$(bmakelib.newline)$(bmakelib.newline)\
 \
-Please either remove your dependency on bmakelib or upgrade to a more$(bmakelib.newline)\
-modern Make.  On most platforms, upgrading is as simple as running $(bmakelib.newline)$(bmakelib.newline)\
+💡 Please upgrade to a more$(bmakelib.newline)\ modern Make. On most platforms, upgrading is as\
+simple as running $(bmakelib.newline)$(bmakelib.newline)\
 \
 \
 $(bmakelib.octospace)wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz' $(bmakelib.backslash)$(bmakelib.newline) \

@@ -58,6 +58,7 @@ make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 %{_includedir}/bmakelib/default-if-blank.mk
 %{_includedir}/bmakelib/timed.mk
 %{_includedir}/bmakelib/logged.mk
+%{_includedir}/bmakelib/enum.mk
 %{_includedir}/bmakelib/VERSION
 
 %{_prefix}/share/doc/bmakelib/LICENSE
@@ -68,6 +69,7 @@ make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 %{_prefix}/share/doc/bmakelib/default-if-blank.md
 %{_prefix}/share/doc/bmakelib/timed.md
 %{_prefix}/share/doc/bmakelib/logged.md
+%{_prefix}/share/doc/bmakelib/enum.md
 
 ####################################################################################################
 

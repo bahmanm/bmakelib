@@ -8,38 +8,40 @@ your Makefiles.
 The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read
 and maintain* Makefiles.
 
-## Example
+## An Example
 
 Makefile:
 
 ```Makefile
 include bmakelib/bmakelib.mk
 
+my-target : bmakelib.error-if-blank( VAR1 )
 my-target :
-	@sleep 2
-	@echo my-target is done
+	@echo ✅ VAR1 value is $(VAR1)
 ```
 
 Shell:
 
+```text
+$ make my-target
+*** Provide value for 'VAR1'.  Stop.
+
+$ make VAR1=foo my-target
+✅ VAR1 value is foo
 ```
-$ make my-target!bmakelib.timed
-my-target is done
-Target 'my-target' took 2009ms to complete.
-```
 
-# bmakelib Contents
+# 1. Features and Options
 
-* [bmakelib.mk](doc/bmakelib.md)
-* [error-if-blank.mk](doc/error-if-blank.md)
-* [default-if-blank.mk](doc/error-if-blank.md)
-* [timed.mk](doc/timed.md)
-* [logged.mk](doc/logged.md)
-* [enum.mk](doc/enum.md)
+### ⭐ [`error-if-blank`](doc/error-if-blank.md)
+### ⭐ [`default-if-blank`](doc/error-if-blank.md)
+### ⭐ [`timed`](doc/timed.md)
+### ⭐ [`logged`](doc/logged.md)
+### ⭐ [`enum`](doc/enum.md)
+### ⭐ [bmakelib.mk](doc/bmakelib.md)
 
-# How To Install
+# 2. How To Install
 
-## Prerequisites
+## 2.1 Prerequisites
 
 Although not an installation dependency, bmakelib relies on **Gnu Make 4.4+** which was released
 back in 2022.
@@ -50,14 +52,10 @@ look like below.
 ```
 $ make -v
 GNU Make 4.4.1
-Built for x86_64-suse-linux-gnu
-Copyright (C) 1988-2023 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+...
 ```
 
-Installing Gnu Make is quite easy.  In fact as easy as:
+💡 Installing Gnu Make is quite easy.  In fact as easy as:
 
 ```
 $ wget https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
@@ -67,7 +65,7 @@ $ ./configure --prefix=/usr/local
 $ make install
 ```
 
-## Installing bmakelib
+## 2.2 Installing bmakelib
 
 ### RPM-based Linux Distro
 
@@ -99,16 +97,16 @@ $ cd bmakelib-0.1.0
 $ sudo PREFIX=/usr/local make install 
 ```
 
-# How To Use - Examples
+# 3. How To Use
 
-bmakelib tries to bring minimal clutter to your Makefiles and be easy to use.  That is, all you need to
-start using bmakelib is adding a single line somewhere in your Makefile:
+bmakelib tries to introduce as little clutter as possible to Makefiles and be easy to use.   
+That is, all you need to start using bmakelib is adding a single line somewhere in your Makefile:
 
 ```Makefile
 include bmakelib/bmakelib.mk
 ```
 
-## Make `include` path
+## 3.1 Make `include` path
 
 💡 *You can safely skip this section if you have installed bmakelib using the prepackaged artefacts or
 you have installed it in a standard location (such as `/usr/local` or `/usr`.)*
@@ -151,24 +149,3 @@ Shell:
 ```
 $ make my-target
 ```
-
-## Example
-
-Here's a sample Makefile which uses `error-if-blank`target to declare a variable and ensure it's got
-a value.
-
-```Makefile
-include bmakelib/bmakelib.mk
-
-my-target : bmakelib.error-if-blank( IMPORTANT_OPTION )
-my-target :
-	some-command --important-option $(IMPORTANT_OPTION)
-```
-
-Now, Make refuses to make `my-target` if you don't specificying a value for `IMPORTANT_OPTION`.
-
-```
-$ make my-target
-*** Provide value for 'IMPORTANT_OPTION.  Stop.
-```
-

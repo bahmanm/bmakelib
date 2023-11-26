@@ -70,12 +70,22 @@ $ make install
 ### RPM-based Linux Distro
 
 Simply grab the prepackaged RPM from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
-and install it using your faourite method, eg `rpm -i bmakelib-0.1.0-1.1.rpm`.
+and install it using your faourite method.  For example:
+
+```text
+$ wget https://github.com/bahmanm/bmakelib/releases/download/v0.6.0/bmakelib-0.6.0-1.1.noarch.rpm
+$ rpm -i bmakelib-0.6.0-1.1.noarch.rpm
+```
 
 ### DEB-based Linux Distro
 
 Simply grab the prepackaged DEB from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
-and install it using your faourite method, eg `dpkg -i bmakelib_0.1.0-1_all.deb`.
+and install it using your faourite method.  For example:
+
+```text
+$ wget https://github.com/bahmanm/bmakelib/releases/download/v0.6.0/bmakelib_0.6.0-1_all.deb
+$ dpkg -i bmakelib_0.6.0-1_all.deb
+```
 
 ### Homebrew (MacOS and Linux)
 
@@ -88,12 +98,12 @@ $ brew install bmakelib
 
 ### Installing From Source
 
-Grab the source archive from the [release page](https://github.com/bahmanm/bmakelib/releases/latest), 
-eg `bmakelib-0.1.0.tar.gz`.
+Grab the source archive from the [release page](https://github.com/bahmanm/bmakelib/releases/latest):
 
 ```
-$ tar zxf bmakelib-0.1.0.tar.gz
-$ cd bmakelib-0.1.0
+$ wget https://github.com/bahmanm/bmakelib/releases/download/v0.6.0/bmakelib-0.6.0.tar.gz
+$ tar zxf bmakelib-0.6.0.tar.gz
+$ cd bmakelib-0.6.0
 $ sudo PREFIX=/usr/local make install 
 ```
 

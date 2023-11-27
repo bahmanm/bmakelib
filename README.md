@@ -33,7 +33,7 @@ $ make VAR1=foo my-target
 # 1. Features and Options
 
 ### ⭐ [`error-if-blank`](doc/error-if-blank.md)
-### ⭐ [`default-if-blank`](doc/error-if-blank.md)
+### ⭐ [`default-if-blank`](doc/default-if-blank.md)
 ### ⭐ [`timed`](doc/timed.md)
 ### ⭐ [`logged`](doc/logged.md)
 ### ⭐ [`enum`](doc/enum.md)

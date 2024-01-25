@@ -1,8 +1,9 @@
 ---
-version: 2.1
+version: 2
 
 executors:
   ubuntu2204:
+    resource_class: medium
     machine:
       image: ubuntu-2204:current
 
@@ -27,6 +28,8 @@ jobs:
           name: Run the tests
           command: >-
             make test
+
+    working_directory: ~/bmakelib
 
 workflows:
   build_test_deploy:

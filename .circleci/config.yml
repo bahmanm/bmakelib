@@ -1,0 +1,33 @@
+---
+version: 2.1
+
+executors:
+  docker:
+    resource_class: medium
+    docker:
+      - image: opensuse/tumbleweed:latest
+        environment:
+          LANG: "en_US.UTF-8"
+
+jobs:
+  test:
+    executor: docker
+    steps:
+      - run:
+          name: Install the runtime
+          command: >-
+            zypper --non-interactive refresh
+            && zypper --non-interactive install \
+               make openssh-clients
+
+      - checkout
+
+      - run:
+          name: Run the tests
+          command: >-
+            make test
+
+workflows:
+  build_test_deploy:
+    jobs:
+      - test

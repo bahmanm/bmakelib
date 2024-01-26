@@ -4,6 +4,7 @@ version: 2.1
 ####################################################################################################
 
 executors:
+
   ubuntu2204:
     resource_class: medium
     machine:
@@ -20,6 +21,7 @@ jobs:
 
   test_linux:
     executor: ubuntu2204
+
     steps:
       - run:
           name: Install the development tools
@@ -45,6 +47,7 @@ jobs:
 
   test_mac:
     executor: mac
+
     steps:
       - run:
           name: Install the development tools

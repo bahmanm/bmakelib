@@ -96,7 +96,7 @@ jobs:
             && cp dist/bmakelib-${BMAKELIB_VERSION}.tar.gz \
                   dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm \
                   dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb \
-                  artefacts
+                  artefacts \
             && export TAG=v${BMAKELIB_VERSION}
             && ghr \
                  -t ${GITHUB_TOKEN} \

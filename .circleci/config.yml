@@ -1,0 +1,129 @@
+---
+version: 2.1
+
+####################################################################################################
+
+executors:
+
+  ubuntu2204:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+
+  mac:
+    resource_class: macos.m1.medium.gen1
+    macos:
+      xcode: 15.2.0
+
+####################################################################################################
+
+jobs:
+
+  test_linux:
+    executor: ubuntu2204
+
+    steps:
+      - run:
+          name: Install the development tools
+          command: >-
+            pushd /tmp
+            && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+            && tar xzf make-4.4.1.tar.gz
+            && cd make-4.4.1
+            && ./configure --prefix=/usr/local
+            && sudo make install
+            && popd
+
+      - checkout
+
+      - run:
+          name: Run the tests and Install bmakelib
+          command: >-
+            export PATH="/usr/local/bin:$PATH"
+            && export TMPDIR=$(mktemp -d)
+            && make PREFIX=${TMPDIR}/ test install
+
+    working_directory: ~/bmakelib
+
+  test_mac:
+    executor: mac
+
+    steps:
+      - run:
+          name: Install the development tools
+          command: >-
+            brew install make git bash
+
+      - checkout
+
+      - run:
+          name: Run the tests and Install bmakelib
+          command: >-
+            export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
+            && export TMPDIR=$(mktemp -d)
+            && make PREFIX=${TMPDIR}/ test install
+
+    working_directory: ~/bmakelib
+
+  release:
+    executor: ubuntu2204
+
+    steps:
+      - run:
+          name: Install the development tools
+          command: >-
+            go install github.com/tcnksm/ghr@latest
+            && pushd /tmp
+            && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+            && tar xzf make-4.4.1.tar.gz
+            && cd make-4.4.1
+            && ./configure --prefix=/usr/local
+            && sudo make install
+            && popd
+
+      - checkout
+
+      - run:
+          name: Build the packages
+          command: >-
+            make package-rpm package-deb
+
+      - run:
+          name: Create the github release
+          command: >-
+            export BMAKELIB_VERSION=$(<src/VERSION)
+            && mkdir -p artefacts
+            && cp dist/bmakelib-${BMAKELIB_VERSION}.tar.gz \
+                  dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm \
+                  dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb \
+                  artefacts \
+            && export TAG=v${BMAKELIB_VERSION}
+            && ghr \
+                 -t ${GITHUB_TOKEN} \
+                 -u ${GITHUB_USERNAME} \
+                 -r ${CIRCLE_PROJECT_REPONAME} \
+                 -c ${CIRCLE_SHA1} \
+                 -n $TAG \
+                 -draft \
+                 -soft \
+                 -generatenotes \
+                 $TAG \
+                 artefacts
+
+    working_directory: ~/bmakelib
+
+####################################################################################################
+
+workflows:
+  test:
+    jobs:
+      - test_linux
+      - test_mac
+  release:
+    jobs:
+      - release:
+          filters:
+            tags:
+              only: /^v.+/
+            branches:
+              ignore: /.*/

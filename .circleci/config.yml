@@ -121,4 +121,9 @@ workflows:
       - test_mac
   release:
     jobs:
-      - release
+      - release:
+          filters:
+            tags:
+              only: /^v.+/
+            branches:
+              ignore: /.*/

@@ -13,7 +13,8 @@
 # limitations under the License.
 ####################################################################################################
 
-SHELL := /usr/bin/env -S bash -eo pipefail
+SHELL := /usr/bin/env bash
+.SHELLFLAGS := -eo pipefail -c
 .DEFAULT_GOAL := test
 
 ####################################################################################################

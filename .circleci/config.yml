@@ -68,4 +68,4 @@ workflows:
   build_test_deploy:
     jobs:
       - test_linux
-#      - test_mac
+      - test_mac

@@ -121,7 +121,4 @@ workflows:
       - test_mac
   release:
     jobs:
-      - release:
-          requires:
-            - test_linux
-            - test_mac
+      - release

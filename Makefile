@@ -13,7 +13,7 @@
 # limitations under the License.
 ####################################################################################################
 
-SHELL := /usr/bin/env -S bash -e -o pipefail --login
+SHELL := /usr/bin/env -S bash --login -eo pipefail
 .DEFAULT_GOAL := test
 
 ####################################################################################################

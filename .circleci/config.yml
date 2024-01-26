@@ -48,7 +48,7 @@ jobs:
           command: >-
             export PATH="/usr/local/bin:$PATH"
             && export TMPDIR=$(mktemp -d)
-            && make PREFIX=${TMPDIR}/ test install
+            && make --debug=jobs PREFIX=${TMPDIR}/ test install
 
     working_directory: ~/bmakelib
 

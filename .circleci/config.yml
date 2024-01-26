@@ -65,6 +65,53 @@ jobs:
 
     working_directory: ~/bmakelib
 
+  release:
+    executor: ubuntu2204
+
+    steps:
+      - run:
+          name: Install the development tools
+          command: >-
+            go install github.com/tcnksm/ghr@latest
+            && pushd /tmp
+            && wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz'
+            && tar xzf make-4.4.1.tar.gz
+            && cd make-4.4.1
+            && ./configure --prefix=/usr/local
+            && sudo make install
+            && popd
+
+      - checkout
+
+      - run:
+          name: Build the packages
+          command: >-
+            make package-rpm package-deb
+
+      - run:
+          name: Create the github release
+          command: >-
+            export BMAKELIB_VERSION=$(<src/VERSION)
+            && mkdir -p artefacts
+            && cp dist/bmakelib-${BMAKELIB_VERSION}.tar.gz \
+                  dist/bmakelib-${BMAKELIB_VERSION}-*.noarch.rpm \
+                  dist/bmakelib_${BMAKELIB_VERSION}-*_all.deb \
+                  artefacts
+            && export TAG=v${BMAKELIB_VERSION}
+            && ghr \
+                 -t ${GITHUB_TOKEN} \
+                 -u ${GITHUB_USERNAME} \
+                 -r ${CIRCLE_PROJECT_REPONAME} \
+                 -c ${CIRCLE_SHA1} \
+                 -n $TAG \
+                 -draft \
+                 -soft \
+                 -generatenotes \
+                 $TAG \
+                 artefacts
+
+    working_directory: ~/bmakelib
+
 ####################################################################################################
 
 workflows:
@@ -72,3 +119,9 @@ workflows:
     jobs:
       - test_linux
       - test_mac
+  release:
+    jobs:
+      - release:
+          requires:
+            - test_linux
+            - test_mac

@@ -8,6 +8,7 @@ executors:
     resource_class: medium
     machine:
       image: ubuntu-2204:current
+    shell: /usr/bin/env -S bash --login -eo pipefail
 
   mac:
     resource_class: macos.m1.medium.gen1

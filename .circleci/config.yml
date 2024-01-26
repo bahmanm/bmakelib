@@ -33,15 +33,6 @@ jobs:
             && sudo make install
             && popd
 
-      - run:
-          name: Debug - Check versions
-          command: >-
-            bash --version
-            && make --version
-            && find --version
-            && mktemp --version
-            && xargs --version
-
       - checkout
 
       - run:
@@ -49,7 +40,7 @@ jobs:
           command: >-
             export PATH="/usr/local/bin:$PATH"
             && export TMPDIR=$(mktemp -d)
-            && make --debug=jobs PREFIX=${TMPDIR}/ test install
+            && make --debug=basic PREFIX=${TMPDIR}/ test install
 
     working_directory: ~/bmakelib
 

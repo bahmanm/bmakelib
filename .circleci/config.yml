@@ -9,11 +9,16 @@ executors:
     machine:
       image: ubuntu-2204:current
 
+  mac:
+    resource_class: macos.m1.medium.gen1
+    macos:
+      xcode: 15.2.0
+
 ####################################################################################################
 
 jobs:
 
-  test:
+  test_linux:
     executor: ubuntu2204
     steps:
       - run:
@@ -30,9 +35,30 @@ jobs:
       - checkout
 
       - run:
-          name: Run the tests
+          name: Run the tests and Install bmakelib
           command: >-
-            make test
+            export PATH="/usr/local/bin:$PATH"
+            && export TMPDIR=$(mktemp -d)
+            && make PREFIX=${TMPDIR}/ test install
+
+    working_directory: ~/bmakelib
+
+  test_mac:
+    executor: mac
+    steps:
+      - run:
+          name: Install the development tools
+          command: >-
+            brew install make git bash
+
+      - checkout
+
+      - run:
+          name: Run the tests and Install bmakelib
+          command: >-
+            export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+            && export TMPDIR=$(mktemp -d)
+            && make PREFIX=${TMPDIR}/ test install
 
     working_directory: ~/bmakelib
 
@@ -41,4 +67,5 @@ jobs:
 workflows:
   build_test_deploy:
     jobs:
-      - test
+      - test_linux
+      - test_mac

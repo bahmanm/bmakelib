@@ -39,6 +39,8 @@ jobs:
           command: >-
             export PATH="/usr/local/bin:$PATH"
             && export TMPDIR=$(mktemp -d)
+            && which env
+            && ls -alh /usr/bin/env
             && make PREFIX=${TMPDIR}/ test install
 
     working_directory: ~/bmakelib

@@ -221,7 +221,6 @@ test : tests.dir := $(shell mktemp -d)
 test : tests.all := $(shell find tests -type f \
 				\( -name 'test_*' $(shell xargs -I{} echo "! -name '{}'" < .gitignore ) \))
 test :
-	which env
 	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
 
 ####################################################################################################

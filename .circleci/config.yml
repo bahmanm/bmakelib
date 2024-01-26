@@ -56,7 +56,7 @@ jobs:
       - run:
           name: Run the tests and Install bmakelib
           command: >-
-            export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+            export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
             && export TMPDIR=$(mktemp -d)
             && make PREFIX=${TMPDIR}/ test install
 

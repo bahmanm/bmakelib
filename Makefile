@@ -217,13 +217,11 @@ clean :
 .PHONY : test
 
 test : export bmakelib.ROOT := $(ROOT)src/
-test : tests.thing1 := $(shell echo thing1)
 test : tests.dir := $(shell mktemp -d)
 test : tests.all := $(shell find tests -type f \
 				\( -name 'test_*' $(shell xargs -I{} echo "! -name '{}'" < .gitignore ) \))
-test : tests.thing2 := $(shell echo thing2)
 test :
-	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' THING1=$(tests.thing1) THING2=$(tests.thing2) $(ROOT)tests/runner
+	RUNNER_ROOT='$(ROOT)' RUNNER_TESTS='$(tests.all)' RUNNER_DIR='$(tests.dir)' $(ROOT)tests/runner
 
 ####################################################################################################
 

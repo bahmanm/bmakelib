@@ -8,10 +8,10 @@ code, fails the Make process with an "error" message.
 Makefile:
 
 ```Makefile
-     VAR1 := $(call bmakelib.shell.error-if-nonzero, echo Kaboom! 💣 && false)
+VAR1 := $(call bmakelib.shell.error-if-nonzero, echo Kaboom! 💣 && false)
 
-     some-target : VAR2 := $(call bmakelib.shell.error-if-nonzero, echo Hello, world)
-     some-target :
+some-target : VAR2 := $(call bmakelib.shell.error-if-nonzero, echo Hello, world)
+some-target :
 	@echo Unreachable recipe ⛔
 ```
 
@@ -77,7 +77,7 @@ $ make some-target
 * Quad-quote all the variables and structures that are supposed to be only understood by shell.
   For example:
   - `$(call bmakelib.shell.error-if-nonzero,echo $$$$HOSTNAME)`
-  - `$(call bmakelib.shell.error-if-nonzero,PATH="/usr/local/foo/bin:$$$$PATH" foo $$$$(date))
+  - `$(call bmakelib.shell.error-if-nonzero,PATH="/usr/local/foo/bin:$$$$PATH" foo $$$$(date))`
 
 * Currently the a command can contain upto **9** comma (,) charaters.
   - This number is totally arbitrary and it can be increased if there's need for it.

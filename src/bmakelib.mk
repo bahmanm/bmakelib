@@ -79,6 +79,19 @@ bmakelib.backslash := $(subst ,\,)
 bmakelib.space := $(subst , ,)
 
 ####################################################################################################
+#>
+#   # `⬛`
+#
+#   Expands to an empty string.
+#
+#   This silly-looking variable is a formatting convenience for cases when whitespace is significant
+#   and will affect the evaluation. See `bmakelib.shell.error-if-nonzero` for an example.
+#<
+####################################################################################################
+
+⬛ :=
+
+####################################################################################################
 #   Abort with, hopefully, an informative message if it's an unsupported Make version.
 ####################################################################################################
 
@@ -117,7 +130,7 @@ export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
 
 ####################################################################################################
 
-bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk
+bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk shell.mk
 
 .PHONY : $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
 

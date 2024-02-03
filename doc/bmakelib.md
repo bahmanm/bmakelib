@@ -36,4 +36,13 @@ Expands to a whitespace
 
 ---
 
+# `⬛`
+
+Expands to an empty string.
+
+This silly-looking variable is a formatting convenience for cases when whitespace is significant
+and will affect the evaluation. See `bmakelib.shell.error-if-nonzero` for an example.
+
+---
+
 

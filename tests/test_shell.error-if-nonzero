@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © 2023 Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# It should process commands containing up to commas
+####################################################################################################
+
+function command_with_commas {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-var1
+
+VAR1 := \$(call bmakelib.shell.error-if-nonzero,echo p1,p2,p3,p4,p5,p6,p7,p8,p9)
+some-target :
+	@echo \$(VAR1)
+EOF
+
+  make some-target > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+p1,p2,p3,p4,p5,p6,p7,p8,p9
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# It should process commands containing pipe and chain operators
+####################################################################################################
+
+function command_with_pipe_and_chain {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+VAR1 := \$(call bmakelib.shell.error-if-nonzero,\
+                bash --version | head -n 1)
+
+VAR2 := \$(call bmakelib.shell.error-if-nonzero,\
+                make --version | grep -q 'GNU Make 4'\
+                && echo Make 4.x || echo Not Make 4.x)
+some-target :
+	@echo '\$(VAR1)'
+	@echo '\$(VAR2)'
+EOF
+
+  make some-target > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+GNU bash.*
+Make 4.*
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# It should process commands containing $ character (eg subshell)
+####################################################################################################
+
+function command_with_ampersand {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+VAR1 := \$(call bmakelib.shell.error-if-nonzero,\
+                [[ ! -z \$$$$HOME ]] && echo HOME set || echo No HOME)
+
+VAR2 := \$(call bmakelib.shell.error-if-nonzero,\
+                [[ ! -z \$$$$(which make) ]] && echo Make in PATH || echo Make not in PATH)
+
+some-target :
+	@echo \$(VAR1)
+	@echo \$(VAR2)
+EOF
+
+  make some-target > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+HOME set
+Make in PATH
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# It should process commands containing comma (,) followed by whitespace
+####################################################################################################
+
+function command_with_comma_followed_by_whitespace {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+VAR1 := \$(call bmakelib.shell.error-if-nonzero,\
+                echo field1,field2,field3 | cut -d, -f 2)
+
+some-target :
+	@echo \$(VAR1)
+EOF
+
+  make some-target > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+field2
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# It should fail make with an error message if the given command fails with a non-zero value.
+####################################################################################################
+
+function failing_command_should_make_with_error_message {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+VAR1 := \$(call bmakelib.shell.error-if-nonzero,\
+                echo This should fail && false)
+
+some-target :
+	@echo \$(VAR1)
+EOF
+
+  make some-target > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+shell.error-if-nonzero: Command exited with non-zero value 1.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+
+test_cases=( command_with_commas \
+               command_with_pipe_and_chain \
+               command_with_ampersand \
+               command_with_comma_followed_by_whitespace \
+               failing_command_should_make_with_error_message )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in ${test_cases[@]}; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

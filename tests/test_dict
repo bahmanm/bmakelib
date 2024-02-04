@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+####################################################################################################
+# Copyright © Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+set -o pipefail
+
+test_suite_name=$(basename $BASH_SOURCE)
+source ${root_dir}tests/lib.sh
+
+####################################################################################################
+# When a dictionary is defined, happy-path put and get operations should work.
+# Using $(call) only.
+####################################################################################################
+
+function happy_path_using_call {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,key1,value1)
+\$(call bmakelib.dict.put,MY-DICT,key2,value2)
+
+a-target :
+	@echo \$(call bmakelib.dict.get,MY-DICT,key1)
+	@echo \$(call bmakelib.dict.get,MY-DICT,key2)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+value1
+value2
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# When a dictionary is defined, happy-path put and get operations should work.
+# Using target dependencies only.
+####################################################################################################
+
+function happy_path_using_target_dependency {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+dict-setup-target : bmakelib.dict.define( MY-DICT )
+dict-setup-target : bmakelib.dict.put( MY-DICT,key1,value1  )
+dict-setup-target : bmakelib.dict.put( MY-DICT,key2,value2  )
+
+a-target : dict-setup-target
+a-target :
+	@echo \$(call bmakelib.dict.get,MY-DICT,key1)
+	@echo \$(call bmakelib.dict.get,MY-DICT,key2)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+value1
+value2
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+
+test_cases=( happy_path_using_call
+             happy_path_using_target_dependency )
+
+test_case_name=''	# mutated in the for loop
+test_suite_status=0	# mutated in the for loop
+for test_case in ${test_cases[@]}; do
+  test_case_name=$test_case
+  if ! bmakelib.test.run_test_case $test_case; then
+    test_suite_status=1
+  fi
+done
+
+exit $test_suite_status

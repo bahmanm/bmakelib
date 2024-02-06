@@ -60,7 +60,37 @@
 
 ####################################################################################################
 #>
-#   # `bmakelib.dict.define`
+#   ## `bmakelib.conf.dict.error-if-blank-key`
+#
+#   Controls whether blank dict keys are accepted.  Default value is `yes`.
+#
+#   If set to
+#   - `yes`, causes an `$(error)` to be raised and make to be aborted.
+#   - anything else, causes the operation to proceed.  However a `$(warning)` message will be
+#     printed.
+#<
+####################################################################################################
+
+bmakelib.conf.dict.error-if-blank-key := yes
+
+####################################################################################################
+#>
+#   ## `bmakelib.conf.dict.error-if-blank-value`
+#
+#   Controls whether blank dict values are accepted.  Default value is `no`.
+#
+#   If set to
+#   - `yes`, causes an `$(error)` to be raised and make to be aborted.
+#   - anything else, causes the operation to proceed.  However a `$(warning)` message will be
+#     printed.
+#<
+####################################################################################################
+
+bmakelib.conf.dict.error-if-blank-value := no
+
+####################################################################################################
+#>
+#   ## `bmakelib.dict.define`
 #
 #   Defines a dictionary.
 #
@@ -100,9 +130,10 @@ bmakelib.dict.define(%) :
 
 ####################################################################################################
 #>
-#   # `bmakelib.dict.put`
+#   ## `bmakelib.dict.put`
 #
 #   Stores a given value in the dictionary under a given key.
+#
 #
 #   ### Example 1
 #
@@ -127,6 +158,16 @@ bmakelib.dict.define(%) :
 ####################################################################################################
 
 define bmakelib.dict.put
+$(eval\
+  $(if $(2),\
+    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-key)),\
+       $(error bmakelib.dict: Key cannot be blank),\
+       $(warning bmakelib.dict: Using blank key.))))\
+$(eval\
+  $(if $(3),\
+    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-value)),\
+       $(error bmakelib.dict: Value cannot be blank),\
+       $(warning bmakelib.dict: Using blank value.))))\
 $(eval bmakelib.dict.define.__$(1).$(2) := $(3))
 endef
 
@@ -139,7 +180,7 @@ bmakelib.dict.put(%) :
 
 ####################################################################################################
 #>
-#   # `bmakelib.dict.get`
+#   ## `bmakelib.dict.get`
 #
 #   Retrieves the value of a given key from the dictionary.
 #

@@ -92,10 +92,205 @@ EOF
 }
 
 ####################################################################################################
+# When a dictionary is defined, `put` should reject a blank key.
+# It should also raise an $(error) if `conf.dict.error-if-blank-key` is set to yes.
+####################################################################################################
+
+function put_should_reject_blank_key_with_error_when_conf_is_set {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,,value1)
+
+a-target :
+         ;
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+bmakelib.dict: Key cannot be blank.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# When a dictionary is defined, `put` should accept a blank key with a $(warning) if
+# `conf.dict.error-if-blank-key` is not set to yes.
+####################################################################################################
+
+function put_should_accept_blank_key_with_warning_when_conf_is_set {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.dict.error-if-blank-key := no
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,,value1)
+
+a-target :
+	@echo \$(call bmakelib.dict.get,MY-DICT,)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\s+bmakelib.dict: Using blank key.
+value1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# The default value of `conf.dict.error-if-blank-key` is yes.
+####################################################################################################
+
+function default_value_of_conf_dict_error_if_blank_key_is_yes {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+a-target :
+	@echo \$(bmakelib.conf.dict.error-if-blank-key)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+yes
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# When a dictionary is defined, `put` should reject a blank value and raise an $(error) if
+# `bmakelib.conf.dict.error-if-blank-value` is set to yes.
+####################################################################################################
+
+function put_should_reject_blank_value_with_error_when_conf_is_set {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.dict.error-if-blank-value := yes
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,key1,)
+
+a-target :
+	@:
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+bmakelib.dict: Value cannot be blank.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# When a dictionary is defined, `put` should accept a blank value and raise a $(warning )if
+# `bmakelib.conf.dict.error-if-blank-value` is not set to yes.
+####################################################################################################
+
+function put_should_accept_blank_value_with_warning_when_conf_is_set {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,key1,)
+
+a-target :
+	@echo \'\$(call bmakelib.dict.get,MY-DICT,key1)\'
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\s+bmakelib.dict: Using blank value.
+''
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# The default value of `conf.dict.error-if-blank-value` is no.
+####################################################################################################
+
+function default_value_of_conf_dict_error_if_blank_value_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+a-target :
+	@echo \$(bmakelib.conf.dict.error-if-blank-value)
+EOF
+
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+no
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( happy_path_using_call
-             happy_path_using_target_dependency )
-
+             happy_path_using_target_dependency
+             put_should_reject_blank_key_with_error_when_conf_is_set
+             put_should_accept_blank_key_with_warning_when_conf_is_set
+             default_value_of_conf_dict_error_if_blank_key_is_yes
+             put_should_reject_blank_value_with_error_when_conf_is_set
+             put_should_accept_blank_value_with_warning_when_conf_is_set
+             default_value_of_conf_dict_error_if_blank_value_is_no )
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop
 for test_case in ${test_cases[@]}; do

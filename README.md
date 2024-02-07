@@ -34,9 +34,10 @@ $ make VAR1=foo my-target
 
 ### ⭐ [`error-if-blank`](doc/error-if-blank.md)
 ### ⭐ [`default-if-blank`](doc/default-if-blank.md)
+### ⭐ [`enum`](doc/enum.md)
+### ⭐ [`shell`](doc/shell.md)
 ### ⭐ [`timed`](doc/timed.md)
 ### ⭐ [`logged`](doc/logged.md)
-### ⭐ [`enum`](doc/enum.md)
 ### ⭐ [bmakelib.mk](doc/bmakelib.md)
 
 # 2. How To Install

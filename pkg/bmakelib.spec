@@ -60,6 +60,7 @@ make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 %{_includedir}/bmakelib/logged.mk
 %{_includedir}/bmakelib/enum.mk
 %{_includedir}/bmakelib/shell.mk
+%{_includedir}/bmakelib/dict.mk
 %{_includedir}/bmakelib/VERSION
 
 %{_prefix}/share/doc/bmakelib/LICENSE
@@ -72,6 +73,7 @@ make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 %{_prefix}/share/doc/bmakelib/logged.md
 %{_prefix}/share/doc/bmakelib/enum.md
 %{_prefix}/share/doc/bmakelib/shell.md
+%{_prefix}/share/doc/bmakelib/dict.md
 
 ####################################################################################################
 

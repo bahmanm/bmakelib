@@ -130,7 +130,7 @@ export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
 
 ####################################################################################################
 
-bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk shell.mk
+bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk enum.mk shell.mk dict.mk
 
 .PHONY : $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
 

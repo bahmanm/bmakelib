@@ -41,7 +41,29 @@ deploy :
 
 ---
 
-# `bmakelib.dict.define`
+## `bmakelib.conf.dict.error-if-blank-key`
+
+Controls whether blank dict keys are accepted.  Default value is `yes`.
+
+If set to
+- `yes`, causes an `$(error)` to be raised and make to be aborted.
+- anything else, causes the operation to proceed.  However a `$(warning)` message will be
+  printed.
+
+---
+
+## `bmakelib.conf.dict.error-if-blank-value`
+
+Controls whether blank dict values are accepted.  Default value is `no`.
+
+If set to
+- `yes`, causes an `$(error)` to be raised and make to be aborted.
+- anything else, causes the operation to proceed.  However a `$(warning)` message will be
+  printed.
+
+---
+
+## `bmakelib.dict.define`
 
 Defines a dictionary.
 
@@ -68,9 +90,10 @@ it to define dictionary `MY-DICT` when it is invoked.
 
 ---
 
-# `bmakelib.dict.put`
+## `bmakelib.dict.put`
 
 Stores a given value in the dictionary under a given key.
+
 
 ### Example 1
 
@@ -94,7 +117,7 @@ it to store the value `a-value` with key `a-key` in the `MY-DICT` when invoked.
 
 ---
 
-# `bmakelib.dict.get`
+## `bmakelib.dict.get`
 
 Retrieves the value of a given key from the dictionary.
 

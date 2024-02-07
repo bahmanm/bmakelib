@@ -36,6 +36,7 @@ $ make VAR1=foo my-target
 ### ⭐ [`default-if-blank`](doc/default-if-blank.md)
 ### ⭐ [`enum`](doc/enum.md)
 ### ⭐ [`shell`](doc/shell.md)
+### ⭐ [`dict`](doc/dict.md)
 ### ⭐ [`timed`](doc/timed.md)
 ### ⭐ [`logged`](doc/logged.md)
 ### ⭐ [bmakelib.mk](doc/bmakelib.md)

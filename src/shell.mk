@@ -36,7 +36,7 @@
 #
 #	```text
 #	$ make some-target
-#	Makefile:4: *** bmakelib.shell.error-if-nonzero: Command exited with non-zero value 1.  Stop.
+#	Makefile:4: *** bmakelib.shell: Command exited with non-zero value 1.  Stop.
 #	```
 #
 #   ###  Example 2
@@ -105,7 +105,7 @@
 ####################################################################################################
 
 define bmakelib.shell.error-if-nonzero
-$(eval bmakelib.shell.error-if-nonzero.__command := $(if $(1),$(1)$(if $(2),$(bmakelib.comma)$(2)$(if $(3),$(bmakelib.comma)$(3)$(if $(4),$(bmakelib.comma)$(4)$(if $(5),$(bmakelib.comma)$(5)$(if $(6),$(bmakelib.comma)$(6)$(if $(7),$(bmakelib.comma)$(7)$(if $(8),$(bmakelib.comma)$(8)$(if $(9),$(bmakelib.comma)$(9)$(if $(10),$(bmakelib.comma)$(10),),),),),),),),),),))$(⬛)$(if $(filter yes,$(bmakelib.conf.shell.error-if-nonzero.SILENT)),,$(info shell.error-if-nonzero: $(bmakelib.shell.error-if-nonzero.__command)))$(⬛)$(eval bmakelib.shell.error-if-nonzero.__result := $(shell $(bmakelib.shell.error-if-nonzero.__command)))$(⬛)$(if $(filter-out 0,$(.SHELLSTATUS)),$(error shell.error-if-nonzero: Command exited with non-zero value $(.SHELLSTATUS)),$(bmakelib.shell.error-if-nonzero.__result))
+$(eval bmakelib.shell.error-if-nonzero.__command := $(if $(1),$(1)$(if $(2),$(bmakelib.comma)$(2)$(if $(3),$(bmakelib.comma)$(3)$(if $(4),$(bmakelib.comma)$(4)$(if $(5),$(bmakelib.comma)$(5)$(if $(6),$(bmakelib.comma)$(6)$(if $(7),$(bmakelib.comma)$(7)$(if $(8),$(bmakelib.comma)$(8)$(if $(9),$(bmakelib.comma)$(9)$(if $(10),$(bmakelib.comma)$(10),),),),),),),),),),))$(⬛)$(if $(filter yes,$(bmakelib.conf.shell.error-if-nonzero.SILENT)),,$(info bmakelib.shell: $(bmakelib.shell.error-if-nonzero.__command)))$(⬛)$(eval bmakelib.shell.error-if-nonzero.__result := $(shell $(bmakelib.shell.error-if-nonzero.__command)))$(⬛)$(if $(filter-out 0,$(.SHELLSTATUS)),$(error bmakelib.shell: Command exited with non-zero value $(.SHELLSTATUS)),$(bmakelib.shell.error-if-nonzero.__result))
 endef
 
 ####################################################################################################

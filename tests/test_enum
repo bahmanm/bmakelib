@@ -231,13 +231,48 @@ EOF
 }
 
 ####################################################################################################
+# Define the enum via target dependency but verify the value via macro
+####################################################################################################
+
+function when_enum_is_defined_via_target_verify_member_via_macro {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.enum.define,ENUM1/v1,v2)
+
+VAR1 ?=
+
+.PHONY : verify-member
+verify-member :
+	\$(call bmakelib.enum.error-unless-member,ENUM1,VAR1)
+	@echo \$(VAR1)
+EOF
+
+  make VAR1=v1 verify-member > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+v1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( when_variable_value_is_a_member_of_the_enum
              when_variable_value_is_not_a_member_of_the_enum
              when_more_than_one_enum_and_variable_values_are_members_of_enums
              when_more_than_one_enum_and_one_variable_value_not_members_of_enum
              when_enum_is_defined_via_macro_verify_member_via_macro
-             when_enum_is_defined_via_macro_verify_member_via_target )
+             when_enum_is_defined_via_macro_verify_member_via_target
+             when_enum_is_defined_via_target_verify_member_via_macro )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

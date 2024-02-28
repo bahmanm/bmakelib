@@ -15,7 +15,7 @@
 
 ####################################################################################################
 #>
-#   # `bmakelib.enum.define`
+#   # `bmakelib.enum.define(%)`
 #
 #   Defines an enum (aka variant or option.)
 #
@@ -67,6 +67,19 @@ bmakelib.enum.define(%) :
 
 ####################################################################################################
 #>
+#   # `bmakelib.enum.define`
+#<
+####################################################################################################
+
+define bmakelib.enum.define
+$(eval \
+	$(eval __enum_name := $(word 1,$(subst $(bmakelib.slash),$(bmakelib.space),$(1)))) \
+	$(eval __enum_members := $(word 2,$(subst $(bmakelib.slash),$(bmakelib.space),$(1))) $(2) $(3) $(4) $(5) $(6) $(7) $(8) $(9) $(10)) \
+	$(eval __enum_$(__enum_name) := $(__enum_members)))
+endef
+
+####################################################################################################
+#>
 #   # `bmakelib.enum.error-unless-member`
 #
 #   Verifies if a variable's value is a member of a given enum and aborts make in case it's not.
@@ -103,3 +116,16 @@ bmakelib.enum.error-unless-member(%) :
 		$(if $(filter $($(__var_name)),$(__enum_$(__enum_name))),\
 			,\
 			$(error '$($(__var_name))' is not a member of enum '$(__enum_name)')))
+
+####################################################################################################
+#>
+#    # `bmakelib.enum.error-unless-member`
+#<
+####################################################################################################
+
+define bmakelib.enum.error-unless-member
+$(eval \
+	$(if $(filter $($(2)),$(__enum_$(1))),\
+		,\
+		$(error '$($(2))' is not a member of enum '$(1)')))
+endef

@@ -43,7 +43,7 @@ before we access them._
 Makefile using target dependency:
 
 ```Makefile
-publish-package : bmakelib.enum.define( PKG-TYPE/deb,rpm,aur)
+publish-package : bmakelib.enum.define( PKG-TYPE/deb,rpm,aur )
 publish-package :
 	...
 ```

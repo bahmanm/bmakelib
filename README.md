@@ -1,4 +1,5 @@
-# bmakelib  [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main.svg?style=shield&circle-token=561907fdacbd1995bf12671fcde92e953216e49e)](https://dl.circleci.com/status-badge/redirect/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main) ![Static Badge](https://img.shields.io/badge/license-Apache_License_v2.0-blue) ![Static Badge](https://img.shields.io/badge/dependencies-NONE-green)
+# bmakelib  [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main.svg?style=shield&circle-token=561907fdacbd1995bf12671fcde92e953216e49e)](https://dl.circleci.com/status-badge/redirect/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=social)
+
 
 The minimalist Make standard library you'd always wished for!
 

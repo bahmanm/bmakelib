@@ -1,5 +1,6 @@
 # bmakelib &nbsp;&nbsp; [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main.svg?style=shield&circle-token=561907fdacbd1995bf12671fcde92e953216e49e)](https://dl.circleci.com/status-badge/redirect/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main) 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=social) &nbsp;&nbsp;&nbsp; ![Matrix](https://img.shields.io/matrix/.mk%3Amatrix.org?server_fqdn=matrix.org&style=social&logo=matrix) &nbsp;&nbsp;&nbsp; ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=social&logo=github)
+
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=social) &nbsp;&nbsp;&nbsp; [![Matrix](https://img.shields.io/matrix/.mk%3Amatrix.org?server_fqdn=matrix.org&style=social&logo=matrix)](https://matrix.to/#/#.mk:matrix.org) &nbsp;&nbsp;&nbsp; ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=social&logo=github)
 
 
 The minimalist Make standard library you'd always wished for!

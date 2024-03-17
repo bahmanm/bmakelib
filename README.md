@@ -7,6 +7,8 @@
 
 The minimalist Make standard library you'd always wished for!
 
+<img alt="bmakelib logo" src="https://imgur.com/lt9nwW3.png" style="height: 200px; width: 200px; vertical-align: top" />
+
 bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment
 your Makefiles.
 

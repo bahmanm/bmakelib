@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 VOLUME /project
 
 ADD https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz /tmp/

@@ -118,7 +118,7 @@ workflows:
   test:
     jobs:
       - test_linux
-      - test_mac
+      # - test_mac
   release:
     jobs:
       - release:

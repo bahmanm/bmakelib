@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Packages and Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build distribution packages
+        run: |
+          make package-rpm package-deb
+
+      - name: Stage release artefacts
+        id: stage
+        run: |
+          VERSION=$(cat src/VERSION)
+          mkdir -p artefacts
+          cp dist/bmakelib-${VERSION}.tar.gz \
+             dist/bmakelib-${VERSION}-*.noarch.rpm \
+             dist/bmakelib_${VERSION}-*_all.deb \
+             artefacts/
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "${TAG}" artefacts/* \
+            --title "${TAG}" \
+            --draft \
+            --generate-notes

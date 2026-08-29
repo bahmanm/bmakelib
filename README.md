@@ -1,5 +1,5 @@
 # bmakelib 
-[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main.svg?style=svg&circle-token=CCIPRJ_H6RDDH8tmi86oJU42UaqJf_e7f27baf05915c0ae68d428ee8a6ddb4f3062e31)](https://dl.circleci.com/status-badge/redirect/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main)
+[![CI](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg)](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=flat&logo=github&logoColor=white&color=0e80c0)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bdockerimg/bmakelib?style=flat&logo=docker&logoColor=white&label=pulls&color=%230e80c0)](https://hub.docker.com/r/bdockerimg/bmakelib)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=flat&logo=github&label=commits)

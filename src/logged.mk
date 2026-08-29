@@ -67,7 +67,8 @@
 #     * See `!!logged` below for a shorter name.
 #     * The name contains two consecutive exclamation marks (`!!`).  That is to denote that it runs a
 #       a new make process.
-#     * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s.%µs.logged` (a la `date` command.)
+#     * The log file name format is `TARGET_NAME-<time-format>.<microseconds>.logged`.
+#     * See `bmakelib.conf.logged.time-format` to customise the timestamp format.
 #<
 ####################################################################################################
 
@@ -135,6 +136,18 @@ bmakelib.conf.logged.SILENT ?= no
 bmakelib.conf.logged.ECHO_COMMAND ?= yes
 
 ####################################################################################################
+#>
+#   # `bmakelib.conf.logged.time-format`
+#
+#   The `strftime`-compatible format string used for the timestamp in log filenames.
+#   Microseconds are always appended to avoid filename collisions.
+#   Default is `%Y%m%d-%H%M%S`.
+#<
+####################################################################################################
+
+bmakelib.conf.logged.time-format ?= %Y%m%d-%H%M%S
+
+####################################################################################################
 #   $(bmakelib.logged._make-and-log-target TARGET)
 #
 #   Emits an info message announcing the log filename and expands to the command which actually runs
@@ -144,8 +157,9 @@ bmakelib.conf.logged.ECHO_COMMAND ?= yes
 define bmakelib.logged._make-and-log-target
 
 $(let ts,$(shell perl -MTime::HiRes=time -MPOSIX \
-		-E '$$e = time(); $$m = ($$e - int($$e)) * 1e6;' \
-		-E 'print strftime("%Y%m%d-%H%M%S", localtime($$e)); printf(".%06.0f", $$m)'),
+		-E 'my ($$fmt) = @ARGV; $$e = time(); $$m = ($$e - int($$e)) * 1e6;' \
+		-E 'print strftime($$fmt, localtime($$e)); printf(".%06.0f", $$m)' \
+		-- "$(or $(bmakelib.conf.logged.time-format),%Y%m%d-%H%M%S)"),
 	$(let log-file,$(ROOT)$(1)-$(ts).logged,
 		$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
 			, \

@@ -287,12 +287,178 @@ EOF
 }
 
 ####################################################################################################
+# the case when bmakelib.conf.logged.time-format is customised in Makefile
+####################################################################################################
+
+function when_time_format_is_custom_in_makefile {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.logged.time-format = %Y-%m-%d_%H%M%S
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with custom time format...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{4}-\d{2}-\d{2}_\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with custom time format...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when bmakelib.conf.logged.time-format is customised on command line
+####################################################################################################
+
+function when_time_format_is_custom_on_command_line {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with CLI time format...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       bmakelib.conf.logged.time-format='%s' \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d+\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with CLI time format...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]+\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when bmakelib.conf.logged.time-format is passed empty on command line
+####################################################################################################
+
+function when_time_format_is_empty_uses_default {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with empty time format...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       bmakelib.conf.logged.time-format= \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with empty time format...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( when_silent_is_no_and_echo_command_is_yes \
                when_silent_is_no_and_echo_command_is_no \
                when_silent_is_yes_and_echo_command_is_yes \
                when_silent_is_yes_and_echo_command_is_no \
-               explicit_prerequisite )
+               explicit_prerequisite \
+               when_time_format_is_custom_in_makefile \
+               when_time_format_is_custom_on_command_line \
+               when_time_format_is_empty_uses_default )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

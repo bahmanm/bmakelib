@@ -50,7 +50,8 @@ $ cat some-target-20230808-16221691536940-834199518.logged
   * See `!!logged` below for a shorter name.
   * The name contains two consecutive exclamation marks (`!!`).  That is to denote that it runs a
     a new make process.
-  * The log file name format is `TARGET_NAME-%Y%m%d-%H%M%s.%µs.logged` (a la `date` command.)
+  * The log file name format is `TARGET_NAME-<time-format>.<microseconds>.logged`.
+  * See `bmakelib.conf.logged.time-format` to customise the timestamp format.
 
 ---
 
@@ -91,6 +92,14 @@ If set to yes, causes `!!bmakelib.logged` to emit an info containing the log fil
 # `bmakelib.conf.logged.ECHO_COMMAND`
 
 If set to no, causes `!!bmakelib.logged` to not echo the actual command it runs.
+
+---
+
+# `bmakelib.conf.logged.time-format`
+
+The `strftime`-compatible format string used for the timestamp in log filenames.
+Microseconds are always appended to avoid filename collisions.
+Default is `%Y%m%d-%H%M%S`.
 
 ---
 

@@ -1,5 +1,5 @@
 # bmakelib 
-[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main.svg?style=svg&circle-token=CCIPRJ_H6RDDH8tmi86oJU42UaqJf_e7f27baf05915c0ae68d428ee8a6ddb4f3062e31)](https://dl.circleci.com/status-badge/redirect/circleci/UMKeFZ8ns9T9vi5aquTfVT/7xEbdNjRYsdqW8yXCjZD9v/tree/main)
+[![CI](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg)](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=flat&logo=github&logoColor=white&color=0e80c0)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bdockerimg/bmakelib?style=flat&logo=docker&logoColor=white&label=pulls&color=%230e80c0)](https://hub.docker.com/r/bdockerimg/bmakelib)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=flat&logo=github&label=commits)
@@ -9,11 +9,9 @@ The minimalist Make standard library you'd always wished for!
 
 <img alt="bmakelib logo" src="https://imgur.com/lt9nwW3.png" style="height: 200px; width: 200px; vertical-align: top" />
 
-bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment
-your Makefiles.
+bmakelib is essentially a collection of useful targets, recipes and variables you can use to augment your Makefiles.
 
-The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read
-and maintain* Makefiles.
+The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read and maintain* Makefiles.
 
 ## An Example
 
@@ -52,11 +50,9 @@ $ make VAR1=foo my-target
 
 ## 2.1 Prerequisites
 
-Although not an installation dependency, bmakelib relies on **Gnu Make 4.4+** which was released
-back in 2022.
+Although not an installation dependency, bmakelib relies on **Gnu Make 4.4+** which was released back in 2022.
 
-To check the version which is currently installed, simply `make -v` in a terminal.  The output should
-look like below.
+To check the version which is currently installed, simply `make -v` in a terminal.  The output should look like below.
 
 ```
 $ make -v
@@ -78,8 +74,7 @@ $ make install
 
 ### RPM-based Linux Distro
 
-Simply grab the prepackaged RPM from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
-and install it using your faourite method.  For example:
+Simply grab the prepackaged RPM from the [release page](https://github.com/bahmanm/bmakelib/releases/latest) and install it using your faourite method.  For example:
 
 ```text
 $ wget https://github.com/bahmanm/bmakelib/releases/download/v0.6.0/bmakelib-0.6.0-1.1.noarch.rpm
@@ -88,8 +83,7 @@ $ rpm -i bmakelib-0.6.0-1.1.noarch.rpm
 
 ### DEB-based Linux Distro
 
-Simply grab the prepackaged DEB from the [release page](https://github.com/bahmanm/bmakelib/releases/latest)
-and install it using your faourite method.  For example:
+Simply grab the prepackaged DEB from the [release page](https://github.com/bahmanm/bmakelib/releases/latest) and install it using your faourite method.  For example:
 
 ```text
 $ wget https://github.com/bahmanm/bmakelib/releases/download/v0.6.0/bmakelib_0.6.0-1_all.deb
@@ -127,11 +121,9 @@ include bmakelib/bmakelib.mk
 
 ## 3.1 Make `include` path
 
-💡 *You can safely skip this section if you have installed bmakelib using the prepackaged artefacts or
-you have installed it in a standard location (such as `/usr/local` or `/usr`.)*
+💡 *You can safely skip this section if you have installed bmakelib using the prepackaged artefacts or you have installed it in a standard location (such as `/usr/local` or `/usr`.)*
 
-In case you installed bmakelib in a non-standard location, you either need to `include` bmakelib using
-full path or pass the installation directory to make via `--include-dir` option.
+In case you installed bmakelib in a non-standard location, you either need to `include` bmakelib using full path or pass the installation directory to make via `--include-dir` option.
 
 For example, assuming you installed bmakelib to `/my-collection/bmakelib`:
 

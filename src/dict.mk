@@ -17,36 +17,39 @@
 #>
 #   # `bmakelib.dict`
 #
-#   Provides a dictionary (aka map) in your makefiles.
+#   Provides key-value dictionaries in GNU Make.
 #
-#   Among other usecases, a dictionary can be used to group related variables/values together.
-#
-#   ### Example 1
+#   ### As Macro (`$(call bmakelib.dict.*)`)
 #
 #	```Makefile
-#	$(call bmakelib.dict.define,DEPLOY)
-#	$(call bmakelib.dict.put,DEPLOY,env,prod)
-#	$(call bmakelib.dict.put,DEPLOY,service,the-accounts-service)
-#	$(call bmakelib.dict.put,DEPLOY,host,accounts.my-cool-product.com)
-#	$(call bmakelib.dict.put,DEPLOY,gpg-key,992443840122)
+#	$(call bmakelib.dict.define,LIBCONF)
+#	$(call bmakelib.dict.put,LIBCONF,lib-name,libhello.a)
+#	$(call bmakelib.dict.put,LIBCONF,lib-objs,hello_impl.o)
 #
-#	$(call bmakelib.dict.define,BUILD)
-#	$(call bmakelib.dict.put,BUILD,arch,x86_64)
-#	$(call bmakelib.dict.put,BUILD,dir,/tmp/my-app/build)
+#	$(call bmakelib.dict.define,EXECONF)
+#	$(call bmakelib.dict.put,EXECONF,exe-name,hello)
+#	$(call bmakelib.dict.put,EXECONF,exe-objs,hello_main.o)
 #
-#	some-target :
-#		@echo DEPLOY.env = $(call bmakelib.dict.get,DEPLOY,env)
-#		@echo BUILD.arch = $(call bmakelib.dict.get,BUILD,arch)
+#	EXE := $(call bmakelib.dict.get,EXECONF,exe-name)
+#	LIB := $(call bmakelib.dict.get,LIBCONF,lib-name)
+#
+#	.PHONY : all
+#	all : $(EXE)
+#
+#	$(EXE) : $(call bmakelib.dict.get,EXECONF,exe-objs) $(LIB)
+#		$(CC) $(CFLAGS) -o $@ $^
+#
+#	$(LIB) : $(call bmakelib.dict.get,LIBCONF,lib-objs)
+#		$(AR) $(ARFLAGS) $@ $^
 #	```
 #
-#   ### Example 2
+#   ### As Prerequisite (`bmakelib.dict.*(...)`)
 #
 #	```Makefile
-#	define-config : bmakelib.dict.define( DEPLOY,env,prod )
+#	define-config : bmakelib.dict.define( DEPLOY )
 #	define-config : bmakelib.dict.put( DEPLOY,env,prod )
 #	define-config : bmakelib.dict.put( DEPLOY,service,accounts )
-#	define-config : bmakelib.dict.put( DEPLOY,host,accounts.my-cool-product.com )
-#	define-config : bmakelib.dict.put( DEPLOY,gpg-key,992443840122 )
+#	define-config : bmakelib.dict.put( DEPLOY,host,accounts.example.com )
 #
 #	deploy : define-config
 #	deploy :
@@ -55,6 +58,9 @@
 #			--server $(call bmakelib.dict.get,DEPLOY,service) \
 #			$(call bmakelib.dict.get,DEPLOY,host)
 #	```
+#
+#   > Note: Setting values via target prerequisites will **not** make them available to
+#   > prerequisite lists (`$(TARGET) : $(call bmakelib.dict.get,...)`).
 #<
 ####################################################################################################
 
@@ -94,26 +100,21 @@ bmakelib.conf.dict.error-if-blank-value := no
 #
 #   Defines a dictionary.
 #
-#   ### Example 1
+#   ### Example 1: As Macro
 #
 #	```Makefile
 #	$(call bmakelib.dict.define,MY-DICT)
 #	```
 #
-#   The above snippet defines a dictionary named `MY-DICT` which can later be used to
-#   store/retrieve items into/from.
+#   Defines a dictionary named `MY-DICT`.
 #
-#   ### Example 2
-#
-#   Makefile:
+#   ### Example 2: As Prerequisite
 #
 #	```Makefile
 #	my-config-target : bmakelib.dict.define( MY-DICT )
-#
 #	```
 #
-#   The above snippet creates a target which has a dependency on `bmakelib.dict.define`, causing
-#   it to define dictionary `MY-DICT` when it is invoked.
+#   Defines dictionary `MY-DICT` when `my-config-target` runs.
 #<
 ####################################################################################################
 
@@ -134,26 +135,23 @@ bmakelib.dict.define(%) :
 #
 #   Stores a given value in the dictionary under a given key.
 #
-#
-#   ### Example 1
+#   ### Example 1: As Macro
 #
 #	```Makefile
 #	$(call bmakelib.dict.define,MY-DICT)
 #	$(call bmakelib.dict.put,MY-DICT,a-key,a-value)
 #	```
 #
-#   The above, stores the value `a-value` with the key `a-key` in `MY-DICT` dictionary.
+#   Stores `a-value` under key `a-key` in `MY-DICT`.
 #
-#   ### Example 2
+#   ### Example 2: As Prerequisite
 #
 #	```Makefile
 #	my-config-target : bmakelib.dict.define( MY-DICT )
 #	my-config-target : bmakelib.dict.put( MY-DICT,a-key,a-value )
-#
 #	```
 #
-#   The above snippet creates a target which has a dependency on `bmakelib.dict.put(%)`, causing
-#   it to store the value `a-value` with key `a-key` in the `MY-DICT` when invoked.
+#   Stores `a-value` under key `a-key` in `MY-DICT` when `my-config-target` runs.
 #<
 ####################################################################################################
 
@@ -184,23 +182,25 @@ bmakelib.dict.put(%) :
 #
 #   Retrieves the value of a given key from the dictionary.
 #
-#   ### Example 1
+#   Note: `bmakelib.dict.get` is a function macro evaluated via `$(call ...)`. It cannot be used as a
+#   target prerequisite because target prerequisites cannot return values.
+#
+#   ### Example 1: In Variable Assignment
 #
 #	```Makefile
 #	VAR1 = $(call bmakelib.dict.get,MY-DICT,a-key)
 #	```
 #
-#   The above, stores the value `a-value` with the key `a-key` in `MY-DICT` dictionary.
+#   Retrieves the value of `a-key` from `MY-DICT` and assigns it to `VAR1`.
 #
-#   ### Example 2
+#   ### Example 2: In Recipe
 #
 #	```Makefile
 #	some-target :
-#		echo $(call bmakelib.dict.get,MY-DICT,a-key)
+#		@echo $(call bmakelib.dict.get,MY-DICT,a-key)
 #	```
 #
-#   The above snippet creates a target which has a dependency on `bmakelib.dict.put(%)`, causing
-#   it to store the value `a-value` with key `a-key` in the `MY-DICT` when invoked.
+#   Retrieves and prints the value of `a-key` from `MY-DICT` when `some-target` runs.
 #<
 ####################################################################################################
 

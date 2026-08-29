@@ -1,5 +1,5 @@
 # bmakelib 
-[![CI](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg)](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml)
+[![CI](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg?branch=main)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=flat&logo=github&logoColor=white&color=0e80c0)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bdockerimg/bmakelib?style=flat&logo=docker&logoColor=white&label=pulls&color=%230e80c0)](https://hub.docker.com/r/bdockerimg/bmakelib)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=flat&logo=github&label=commits)

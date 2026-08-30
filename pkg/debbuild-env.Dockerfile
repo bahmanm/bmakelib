@@ -1,7 +1,7 @@
 FROM ubuntu:26.04
 VOLUME /project
 
-ADD https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz /tmp/
+ADD https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz /tmp/
 RUN apt-get update \
     && apt-get install -y gcc perl make
 

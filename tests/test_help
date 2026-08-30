@@ -40,17 +40,16 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS
     my-target  Build a sample target
 
   VARIABLES
-    MY_VAR  A sample configuration variable
-
+(?:\s+[^\n]+\n)+
 ={80}
-  INCLUDED
+  INCLUDED: imported from included makefiles
 ={80}
 
   TARGETS
@@ -58,7 +57,8 @@ make.+Entering.+
     help           Convenience target with a shorter and more intuitive name\..*
 
   VARIABLES
-(?:\s+bmakelib\.[^\n]+\n)+
+(?:\s+[^\n]+\n)+
+(?:={80}\n  BUILTIN: predefined by GNU Make\n={80}\n\n  TARGETS\n(?:\s+[^\n]+\n)+)?
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
@@ -96,15 +96,14 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS
     my-target  Build a sample target
 
   VARIABLES
-    MY_VAR  A sample configuration variable
-
+(?:\s+[^\n]+\n)+
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
@@ -142,12 +141,11 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   VARIABLES
-    MY_VAR  A sample configuration variable
-
+(?:\s+[^\n]+\n)+
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
@@ -185,7 +183,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS
@@ -228,15 +226,14 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS
     my-target  Build a sample target
 
   VARIABLES
-    MY_VAR  A sample configuration variable
-
+(?:\s+[^\n]+\n)+
 make.+Leaving.+
 EOF
 
@@ -272,15 +269,14 @@ make.+Entering.+
 make.+Leaving.+
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS
     my-target  Build a sample target
 
   VARIABLES
-    MY_VAR  A sample configuration variable
-
+(?:\s+[^\n]+\n)+
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
@@ -324,7 +320,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL
+  LOCAL: defined in the source tree
 ={80}
 
   TARGETS

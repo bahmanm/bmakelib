@@ -50,16 +50,19 @@ sub get_file_lines {
 sub classify_scope {
     my ($origin_type, $file_path, $root_dir, $bmakelib_dir) = @_;
     return 'builtin' if defined $origin_type && $origin_type eq 'builtin';
-    return 'builtin' unless defined $file_path && length $file_path;
 
-    my $abs_file = -e $file_path ? abs_path($file_path) : $file_path;
-    if (index($abs_file, $bmakelib_dir) == 0) {
+    if (defined $file_path && length $file_path) {
+        my $abs_file = -e $file_path ? abs_path($file_path) : $file_path;
+        if (index($abs_file, $bmakelib_dir) == 0) {
+            return 'included';
+        }
+        if (index($abs_file, $root_dir) == 0 || $file_path !~ m#^/#) {
+            return 'local';
+        }
         return 'included';
     }
-    if (index($abs_file, $root_dir) == 0 || $file_path !~ m#^/#) {
-        return 'local';
-    }
-    return 'included';
+
+    return ($origin_type eq 'makefile') ? 'local' : 'builtin';
 }
 
 ####################################################################################################
@@ -237,12 +240,125 @@ sub process_target {
         ($file, $line) = find_symbol_in_files($name, 'target', $root_dir);
     }
 
-    my $scope = $builtin ? 'builtin' : classify_scope('makefile', $file, $root_dir, $bmakelib_dir);
+    my $scope;
+    if ($builtin) {
+        $scope = 'builtin';
+    } elsif (defined $file) {
+        $scope = classify_scope('makefile', $file, $root_dir, $bmakelib_dir);
+    } elsif ($name =~ /^bmakelib\./) {
+        $scope = 'included';
+    } else {
+        $scope = 'local';
+    }
+
     if ($active_scopes_ref->{$scope} && $show_targets) {
         my $doc = extract_docstring($name, $file, $line);
         $doc = 'n/a' unless defined $doc && $doc ne '';
         $targets_by_scope_ref->{$scope}{$name} = $doc;
     }
+}
+
+####################################################################################################
+# parse_variables_section(root_dir, bmakelib_dir, show_vars, active_scopes_ref, variables_by_scope_ref)
+####################################################################################################
+sub parse_variables_section {
+    my ($root_dir, $bmakelib_dir, $show_vars, $active_scopes_ref, $variables_by_scope_ref) = @_;
+
+    my $seen_pattern_vars = 0;
+
+    while (my $line = <STDIN>) {
+        if ($line =~ /^MAKEFILE_LIST\s*[:?+]?=\s*(.+)$/) {
+            my @files = split(/\s+/, $1);
+            for my $f (@files) {
+                my $abs_f = ($f =~ m#^/#) ? $f : abs_path($root_dir . $f);
+                get_file_lines($abs_f) if defined $abs_f && -f $abs_f;
+            }
+        }
+        if ($line =~ /^# (?:Pattern-specific Variable Values|No pattern-specific variable values\.)/) {
+            $seen_pattern_vars = 1;
+            next;
+        }
+        if ($seen_pattern_vars && $line =~ /^# Files\s*$/) {
+            last;
+        }
+        parse_variable_line(
+            $line,
+            $active_scopes_ref,
+            $show_vars,
+            $root_dir,
+            $bmakelib_dir,
+            $variables_by_scope_ref,
+        );
+    }
+}
+
+####################################################################################################
+# parse_targets_section(root_dir, bmakelib_dir, show_targets, active_scopes_ref, targets_by_scope_ref)
+####################################################################################################
+sub parse_targets_section {
+    my ($root_dir, $bmakelib_dir, $show_targets, $active_scopes_ref, $targets_by_scope_ref) = @_;
+
+    my $pending_not_target = 0;
+    my %target_state = (
+        name       => undef,
+        file       => undef,
+        line       => undef,
+        builtin    => 0,
+        not_target => 0,
+    );
+
+    while (my $line = <STDIN>) {
+        if ($line =~ /^# Not a target:/) {
+            $pending_not_target = 1;
+        } elsif ($line =~ /^#\s+recipe to execute \(from '([^']+)', line (\d+)\):/) {
+            $target_state{file} = $1;
+            $target_state{line} = $2;
+            get_file_lines($target_state{file});
+        } elsif ($line =~ /^#\s+(?:Builtin rule|recipe to execute \(built-in\))/) {
+            $target_state{builtin} = 1;
+        } elsif ($line =~ /^([a-zA-Z0-9_.-]+)\s*:(?!=)/) {
+            my $next_target = $1;
+            process_target(
+                \%target_state,
+                $active_scopes_ref,
+                $show_targets,
+                $root_dir,
+                $bmakelib_dir,
+                $targets_by_scope_ref,
+            );
+            $target_state{name}       = $next_target;
+            $target_state{not_target} = $pending_not_target;
+            $pending_not_target       = 0;
+        } elsif ($line =~ /^\s*$/) {
+            process_target(
+                \%target_state,
+                $active_scopes_ref,
+                $show_targets,
+                $root_dir,
+                $bmakelib_dir,
+                $targets_by_scope_ref,
+            );
+        } elsif ($line =~ /^# (?:VPATH Utilities|files hash-table-stats)/) {
+            process_target(
+                \%target_state,
+                $active_scopes_ref,
+                $show_targets,
+                $root_dir,
+                $bmakelib_dir,
+                $targets_by_scope_ref,
+            );
+            last;
+        }
+    }
+
+    process_target(
+        \%target_state,
+        $active_scopes_ref,
+        $show_targets,
+        $root_dir,
+        $bmakelib_dir,
+        $targets_by_scope_ref,
+    );
 }
 
 ####################################################################################################
@@ -254,83 +370,19 @@ sub parse_database {
     my %targets_by_scope   = (local => {}, included => {}, builtin => {});
     my %variables_by_scope = (local => {}, included => {}, builtin => {});
 
-    my $in_files = 0;
-    my $seen_pattern_vars = 0;
-
-    my %target_state = (
-        name       => undef,
-        file       => undef,
-        line       => undef,
-        builtin    => 0,
-        not_target => 0,
-    );
-
-    while (my $line = <STDIN>) {
-        if (!$in_files) {
-            if ($line =~ /^# (?:Pattern-specific Variable Values|No pattern-specific variable values\.)/) {
-                $seen_pattern_vars = 1;
-                next;
-            }
-            if ($seen_pattern_vars && $line =~ /^# Files\s*$/) {
-                $in_files = 1;
-                next;
-            }
-            parse_variable_line(
-                $line,
-                $active_scopes_ref,
-                $show_vars,
-                $root_dir,
-                $bmakelib_dir,
-                \%variables_by_scope,
-            );
-        } else {
-            if ($line =~ /^# Not a target:/) {
-                $target_state{not_target} = 1;
-            } elsif ($line =~ /^#\s+recipe to execute \(from '([^']+)', line (\d+)\):/) {
-                $target_state{file} = $1;
-                $target_state{line} = $2;
-                get_file_lines($target_state{file});
-            } elsif ($line =~ /^#\s+(?:Builtin rule|recipe to execute \(built-in\))/) {
-                $target_state{builtin} = 1;
-            } elsif ($line =~ /^([a-zA-Z0-9_.-]+)\s*:(?!=)/) {
-                process_target(
-                    \%target_state,
-                    $active_scopes_ref,
-                    $show_targets,
-                    $root_dir,
-                    $bmakelib_dir,
-                    \%targets_by_scope,
-                );
-                $target_state{name} = $1;
-            } elsif ($line =~ /^\s*$/) {
-                process_target(
-                    \%target_state,
-                    $active_scopes_ref,
-                    $show_targets,
-                    $root_dir,
-                    $bmakelib_dir,
-                    \%targets_by_scope,
-                );
-            } elsif ($line =~ /^# (?:VPATH Utilities|files hash-table-stats)/) {
-                process_target(
-                    \%target_state,
-                    $active_scopes_ref,
-                    $show_targets,
-                    $root_dir,
-                    $bmakelib_dir,
-                    \%targets_by_scope,
-                );
-                last;
-            }
-        }
-    }
-
-    process_target(
-        \%target_state,
-        $active_scopes_ref,
-        $show_targets,
+    parse_variables_section(
         $root_dir,
         $bmakelib_dir,
+        $show_vars,
+        $active_scopes_ref,
+        \%variables_by_scope,
+    );
+
+    parse_targets_section(
+        $root_dir,
+        $bmakelib_dir,
+        $show_targets,
+        $active_scopes_ref,
         \%targets_by_scope,
     );
 
@@ -374,6 +426,11 @@ sub render_help {
     my ($targets_by_scope_ref, $variables_by_scope_ref, $active_scopes_ref, $show_targets, $show_vars, $show_tips) = @_;
 
     my @scope_order = qw(local included builtin);
+    my %scope_descriptions = (
+        local    => 'defined in the source tree',
+        included => 'imported from included makefiles',
+        builtin  => 'predefined by GNU Make',
+    );
     my $has_rendered_any = 0;
 
     for my $sc (@scope_order) {
@@ -383,7 +440,8 @@ sub render_help {
         next unless (keys %t || keys %v);
 
         $has_rendered_any = 1;
-        my $banner_title = uc($sc);
+        my $desc = $scope_descriptions{$sc} ? ": $scope_descriptions{$sc}" : '';
+        my $banner_title = uc($sc) . $desc;
         say "=" x 80;
         say "  $banner_title";
         say "=" x 80;

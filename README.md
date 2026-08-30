@@ -63,7 +63,7 @@ GNU Make 4.4.1
 💡 Installing Gnu Make is quite easy.  In fact as easy as:
 
 ```
-$ wget https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+$ wget https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz
 $ tar xzf make-4.4.1.tar.gz
 $ cd make-4.4.1
 $ ./configure --prefix=/usr/local

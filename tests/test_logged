@@ -775,6 +775,369 @@ EOF
 }
 
 ####################################################################################################
+# BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET=no disables convenience target %!!logged
+####################################################################################################
+
+function when_env_var_convenience_target_is_no_disables_convenience_target {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET=no \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!bmakelib.logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_convenience_target {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+bmakelib.conf.logged.convenience-target := yes
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET=no \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# BMAKELIB_CONF_LOGGED_SILENT=yes and BMAKELIB_CONF_LOGGED_ECHO_COMMAND=no in environment
+####################################################################################################
+
+function when_env_var_silent_is_yes_and_echo_command_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_LOGGED_SILENT=yes \
+  BMAKELIB_CONF_LOGGED_ECHO_COMMAND=no \
+  make some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_LOGGED_SILENT environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_silent {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+bmakelib.conf.logged.SILENT := no
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_LOGGED_SILENT=yes \
+  make bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# CLI variable overrides BMAKELIB_CONF_LOGGED_ECHO_COMMAND environment variable
+####################################################################################################
+
+function when_cli_overrides_env_var_for_echo_command {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_LOGGED_ECHO_COMMAND=yes \
+  make bmakelib.conf.logged.SILENT=yes \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# BMAKELIB_CONF_LOGGED_TIME_FORMAT environment variable sets custom timestamp format
+####################################################################################################
+
+function when_env_var_time_format_is_custom {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with env var time format...
+EOF
+
+  BMAKELIB_CONF_LOGGED_TIME_FORMAT='%s' \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d+\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with env var time format...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]+\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_LOGGED_TIME_FORMAT environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_time_format {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := \$(dir \$(abspath \$(lastword \$(MAKEFILE_LIST))))
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.logged.time-format = %Y-%m-%d_%H%M%S
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with makefile override time format...
+EOF
+
+  BMAKELIB_CONF_LOGGED_TIME_FORMAT='%s' \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to .+/some-target-\d{4}-\d{2}-\d{2}_\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with makefile override time format...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( when_silent_is_no_and_echo_command_is_yes \
                when_silent_is_no_and_echo_command_is_no \
@@ -789,7 +1152,14 @@ test_cases=( when_silent_is_no_and_echo_command_is_yes \
                when_output_dir_is_custom_without_trailing_slash \
                when_output_dir_is_custom_on_command_line \
                when_env_var_output_dir_is_set \
-               when_root_is_defined_fallback )
+               when_root_is_defined_fallback \
+               when_env_var_convenience_target_is_no_disables_convenience_target \
+               when_makefile_var_overrides_env_var_for_convenience_target \
+               when_env_var_silent_is_yes_and_echo_command_is_no \
+               when_makefile_var_overrides_env_var_for_silent \
+               when_cli_overrides_env_var_for_echo_command \
+               when_env_var_time_format_is_custom \
+               when_makefile_var_overrides_env_var_for_time_format )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

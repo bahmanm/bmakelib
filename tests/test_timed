@@ -149,11 +149,176 @@ EOF
 }
 
 ####################################################################################################
+# do not emit any additional output if BMAKELIB_CONF_TIMED_SILENT is set to yes
+####################################################################################################
+
+function when_env_var_timed_silent_is_yes_no_output {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_TIMED_SILENT=yes \
+  make some-target!timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_TIMED_SILENT environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_timed_silent {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+bmakelib.conf.timed.SILENT := no
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_TIMED_SILENT=yes \
+  make some-target!timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target...
+Target 'some-target' took (?<duration>\d+)ms to complete.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# CLI argument overrides BMAKELIB_CONF_TIMED_SILENT environment variable
+####################################################################################################
+
+function when_cli_overrides_env_var_for_timed_silent {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target...
+EOF
+
+  BMAKELIB_CONF_TIMED_SILENT=no \
+  make bmakelib.conf.timed.SILENT=yes some-target!timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET=no disables convenience target !timed
+####################################################################################################
+
+function when_env_var_convenience_target_is_no_disables_convenience_target {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit timed prereq...
+EOF
+
+  BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET=no \
+  make some-target!bmakelib.timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target with implicit timed prereq...
+Target 'some-target' took (?<duration>\d+)ms to complete.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_convenience_target {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+bmakelib.conf.timed.convenience-target := yes
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with implicit timed prereq...
+EOF
+
+  BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET=no \
+  make some-target!timed > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Running some-target with implicit timed prereq...
+Target 'some-target' took (?<duration>\d+)ms to complete.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( ok_emit_info_with_duration_implicit_prerequisite \
                ok_emit_info_with_duration_explicit_prerequisite \
                ok_no_additional_output_if_silent \
-               ok_emit_info_when_convenience_target_is_disabled )
+               ok_emit_info_when_convenience_target_is_disabled \
+               when_env_var_timed_silent_is_yes_no_output \
+               when_makefile_var_overrides_env_var_for_timed_silent \
+               when_cli_overrides_env_var_for_timed_silent \
+               when_env_var_convenience_target_is_no_disables_convenience_target \
+               when_makefile_var_overrides_env_var_for_convenience_target )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

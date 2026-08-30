@@ -113,7 +113,7 @@ behaviours and hard to find bugs.$(bmakelib.newline)$(bmakelib.newline)\
 simple as running $(bmakelib.newline)$(bmakelib.newline)\
 \
 \
-$(bmakelib.octospace)wget 'https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz' $(bmakelib.backslash)$(bmakelib.newline) \
+$(bmakelib.octospace)wget 'https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz' $(bmakelib.backslash)$(bmakelib.newline) \
 $(bmakelib.octospace)&& tar xzf make-4.4.1.tar.gz                          $(bmakelib.backslash)$(bmakelib.newline) \
 $(bmakelib.octospace)&& cd make-4.4.1                                      $(bmakelib.backslash)$(bmakelib.newline) \
 $(bmakelib.octospace)&& ./configure --prefix=/usr/local                    $(bmakelib.backslash)$(bmakelib.newline) \

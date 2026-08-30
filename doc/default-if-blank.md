@@ -56,7 +56,10 @@ some-target : bmakelib.default-if-blank( VAR1,hello world )
 Controls whether `bmakelib.default-if-blank` should emit an info message when using the default
 provided.
 
-Default is "yes" which means do NOT emit.  Set to "no" to make it behave otherwise.
+Precedence:
+  1. `bmakelib.conf.default-if-blank.SILENT` (Make variable)
+  2. `BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT` (environment variable)
+  3. `yes` (default)
 
 ---
 

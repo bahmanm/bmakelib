@@ -185,12 +185,122 @@ EOF
 }
 
 ####################################################################################################
+# emit an info message when BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT is set to no
+####################################################################################################
+
+function when_env_var_is_set_to_no_emits_info {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+echo-vars : VAR2 := 200
+echo-vars : VAR4 := 400
+echo-vars : bmakelib.default-if-blank( VAR1,v1 VAR2,v2 VAR3,v3 VAR4,v4 )
+echo-vars :
+	@echo \$(VAR1), \$(VAR2), \$(VAR3), \$(VAR4)
+EOF
+
+  BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT=no \
+  make echo-vars > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Using default value 'v1' for variable 'VAR1'
+Using default value 'v3' for variable 'VAR3'
+v1, 200, v3, 400
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# makefile variable overrides BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT environment variable
+####################################################################################################
+
+function when_makefile_var_overrides_env_var {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+bmakelib.conf.default-if-blank.SILENT := yes
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+echo-vars : VAR2 := 200
+echo-vars : VAR4 := 400
+echo-vars : bmakelib.default-if-blank( VAR1,v1 VAR2,v2 VAR3,v3 VAR4,v4 )
+echo-vars :
+	@echo \$(VAR1), \$(VAR2), \$(VAR3), \$(VAR4)
+EOF
+
+  BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT=no \
+  make echo-vars > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+v1, 200, v3, 400
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# command line argument overrides BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT environment variable
+####################################################################################################
+
+function when_cli_overrides_env_var {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : echo-vars
+
+echo-vars : VAR2 := 200
+echo-vars : VAR4 := 400
+echo-vars : bmakelib.default-if-blank( VAR1,v1 VAR2,v2 VAR3,v3 VAR4,v4 )
+echo-vars :
+	@echo \$(VAR1), \$(VAR2), \$(VAR3), \$(VAR4)
+EOF
+
+  BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT=yes \
+  make bmakelib.conf.default-if-blank.SILENT=no echo-vars > $actual_value_filename 2>&1
+
+  local expected_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expected_pattern_filename
+make.+Entering.+
+Using default value 'v1' for variable 'VAR1'
+Using default value 'v3' for variable 'VAR3'
+v1, 200, v3, 400
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expected_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( use_default_when_blank
              use_default_when_blank_passed_on_command_line
              ignore_default_when_nonblank
              multiple_variable_value_pairs
-             emit_info_when_not_SILENT )
+             emit_info_when_not_SILENT
+             when_env_var_is_set_to_no_emits_info
+             when_makefile_var_overrides_env_var
+             when_cli_overrides_env_var )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

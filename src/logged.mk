@@ -98,10 +98,15 @@ bmakelib.conf.logged.output-dir ?= $(or $(BMAKELIB_CONF_LOGGED_OUTPUT_DIR),$(ROO
 #
 #   Whether to define the convenience target `%!!logged`.
 #   Set to 'no' *before* including bmakelib to disable.
+#
+#   Precedence:
+#     1. `bmakelib.conf.logged.convenience-target` (Make variable)
+#     2. `BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET` (environment variable)
+#     3. `yes` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.logged.convenience-target ?= yes
+bmakelib.conf.logged.convenience-target ?= $(or $(BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET),yes)
 
 ####################################################################################################
 #>
@@ -137,20 +142,30 @@ endif
 #   # `bmakelib.conf.logged.SILENT`
 #
 #   If set to yes, causes `!!bmakelib.logged` to emit an info containing the log filename.
+#
+#   Precedence:
+#     1. `bmakelib.conf.logged.SILENT` (Make variable)
+#     2. `BMAKELIB_CONF_LOGGED_SILENT` (environment variable)
+#     3. `no` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.logged.SILENT ?= no
+bmakelib.conf.logged.SILENT ?= $(or $(BMAKELIB_CONF_LOGGED_SILENT),no)
 
 ####################################################################################################
 #>
 #   # `bmakelib.conf.logged.ECHO_COMMAND`
 #
 #   If set to no, causes `!!bmakelib.logged` to not echo the actual command it runs.
+#
+#   Precedence:
+#     1. `bmakelib.conf.logged.ECHO_COMMAND` (Make variable)
+#     2. `BMAKELIB_CONF_LOGGED_ECHO_COMMAND` (environment variable)
+#     3. `yes` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.logged.ECHO_COMMAND ?= yes
+bmakelib.conf.logged.ECHO_COMMAND ?= $(or $(BMAKELIB_CONF_LOGGED_ECHO_COMMAND),yes)
 
 ####################################################################################################
 #>
@@ -158,11 +173,15 @@ bmakelib.conf.logged.ECHO_COMMAND ?= yes
 #
 #   The `strftime`-compatible format string used for the timestamp in log filenames.
 #   Microseconds are always appended to avoid filename collisions.
-#   Default is `%Y%m%d-%H%M%S`.
+#
+#   Precedence:
+#     1. `bmakelib.conf.logged.time-format` (Make variable)
+#     2. `BMAKELIB_CONF_LOGGED_TIME_FORMAT` (environment variable)
+#     3. `%Y%m%d-%H%M%S` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.logged.time-format ?= %Y%m%d-%H%M%S
+bmakelib.conf.logged.time-format ?= $(or $(BMAKELIB_CONF_LOGGED_TIME_FORMAT),%Y%m%d-%H%M%S)
 
 ####################################################################################################
 #   $(bmakelib.logged._make-and-log-target TARGET)
@@ -177,7 +196,7 @@ $(let ts,$(shell perl -MTime::HiRes=time -MPOSIX \
 		-E 'my ($$fmt) = @ARGV; $$e = time(); $$m = ($$e - int($$e)) * 1e6;' \
 		-E 'print strftime($$fmt, localtime($$e)); printf(".%06.0f", $$m)' \
 		-- "$(or $(bmakelib.conf.logged.time-format),%Y%m%d-%H%M%S)"),
-	$(let log-dir,$(patsubst %/,%,$(or $(bmakelib.conf.logged.output-dir),$(BMAKELIB_CONF_LOGGED_OUTPUT_DIR),$(ROOT),.))/,
+	$(let log-dir,$(patsubst %/,%,$(or $(bmakelib.conf.logged.output-dir),.))/,
 		$(let log-file,$(log-dir)$(1)-$(ts).logged,
 			$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
 				, \

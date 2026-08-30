@@ -2,5 +2,5 @@ bmakelib (%VERSION%-1) %DISTRO%; urgency=medium
 
   * Release %VERSION%
 
--- %GIT_USER% <%GIT_EMAIL%>   %DATE%
+ -- %GIT_USER% <%GIT_EMAIL%>  %DATE%
 

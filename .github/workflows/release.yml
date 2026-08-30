@@ -36,7 +36,7 @@ jobs:
         run: |
           VERSION=$(cat src/VERSION)
           mkdir -p artefacts
-          cp dist/bmakelib-${VERSION}.tar.gz \
+          cp dist/bmakelib-${VERSION}-portable.tar.gz \
              dist/bmakelib-${VERSION}-*.noarch.rpm \
              dist/bmakelib_${VERSION}-*_all.deb \
              artefacts/

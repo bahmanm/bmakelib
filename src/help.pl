@@ -187,10 +187,10 @@ sub extract_docstring {
 }
 
 ####################################################################################################
-# parse_variable_line(line, active_scopes_ref, show_vars, root_dir, bmakelib_dir, variables_by_scope_ref)
+# parse_variable_line(line, active_scopes_ref, show_vars, root_dir, bmakelib_dir, variables_by_scope_ref, show_bmakelib)
 ####################################################################################################
 sub parse_variable_line {
-    my ($line, $active_scopes_ref, $show_vars, $root_dir, $bmakelib_dir, $variables_by_scope_ref) = @_;
+    my ($line, $active_scopes_ref, $show_vars, $root_dir, $bmakelib_dir, $variables_by_scope_ref, $show_bmakelib) = @_;
 
     if ($line =~ /^# makefile \(from '([^']+)', line (\d+)\)/) {
         my $var_file = $1;
@@ -203,6 +203,9 @@ sub parse_variable_line {
             my $var_name = $1;
             unless ($var_name =~ /^bmakelib\..*\.__/ || $var_name =~ /^_bmakelib\./ || $var_name =~ /^__/) {
                 my $scope = classify_scope('makefile', $var_file, $root_dir, $bmakelib_dir);
+                if ($scope eq 'included' && !$show_bmakelib && ($var_name =~ /^bmakelib\./ || (defined $var_file && $var_file =~ /^\Q$bmakelib_dir\E/))) {
+                    return;
+                }
                 if ($active_scopes_ref->{$scope} && $show_vars) {
                     my $doc = extract_docstring($var_name, $var_file, $var_line);
                     $doc = 'n/a' unless defined $doc && $doc ne '';
@@ -214,10 +217,10 @@ sub parse_variable_line {
 }
 
 ####################################################################################################
-# process_target(target_state_ref, active_scopes_ref, show_targets, root_dir, bmakelib_dir, targets_by_scope_ref)
+# process_target(target_state_ref, active_scopes_ref, show_targets, root_dir, bmakelib_dir, targets_by_scope_ref, show_bmakelib)
 ####################################################################################################
 sub process_target {
-    my ($target_state_ref, $active_scopes_ref, $show_targets, $root_dir, $bmakelib_dir, $targets_by_scope_ref) = @_;
+    my ($target_state_ref, $active_scopes_ref, $show_targets, $root_dir, $bmakelib_dir, $targets_by_scope_ref, $show_bmakelib) = @_;
 
     my $name       = $target_state_ref->{name};
     my $file       = $target_state_ref->{file};
@@ -251,6 +254,10 @@ sub process_target {
         $scope = 'local';
     }
 
+    if ($scope eq 'included' && !$show_bmakelib && ($name =~ /^bmakelib\./ || $name eq 'help' || (defined $file && $file =~ /^\Q$bmakelib_dir\E/))) {
+        return;
+    }
+
     if ($active_scopes_ref->{$scope} && $show_targets) {
         my $doc = extract_docstring($name, $file, $line);
         $doc = 'n/a' unless defined $doc && $doc ne '';
@@ -259,10 +266,10 @@ sub process_target {
 }
 
 ####################################################################################################
-# parse_variables_section(root_dir, bmakelib_dir, show_vars, active_scopes_ref, variables_by_scope_ref)
+# parse_variables_section(root_dir, bmakelib_dir, show_vars, active_scopes_ref, variables_by_scope_ref, show_bmakelib)
 ####################################################################################################
 sub parse_variables_section {
-    my ($root_dir, $bmakelib_dir, $show_vars, $active_scopes_ref, $variables_by_scope_ref) = @_;
+    my ($root_dir, $bmakelib_dir, $show_vars, $active_scopes_ref, $variables_by_scope_ref, $show_bmakelib) = @_;
 
     my $seen_pattern_vars = 0;
 
@@ -288,15 +295,16 @@ sub parse_variables_section {
             $root_dir,
             $bmakelib_dir,
             $variables_by_scope_ref,
+            $show_bmakelib,
         );
     }
 }
 
 ####################################################################################################
-# parse_targets_section(root_dir, bmakelib_dir, show_targets, active_scopes_ref, targets_by_scope_ref)
+# parse_targets_section(root_dir, bmakelib_dir, show_targets, active_scopes_ref, targets_by_scope_ref, show_bmakelib)
 ####################################################################################################
 sub parse_targets_section {
-    my ($root_dir, $bmakelib_dir, $show_targets, $active_scopes_ref, $targets_by_scope_ref) = @_;
+    my ($root_dir, $bmakelib_dir, $show_targets, $active_scopes_ref, $targets_by_scope_ref, $show_bmakelib) = @_;
 
     my $pending_not_target = 0;
     my %target_state = (
@@ -325,6 +333,7 @@ sub parse_targets_section {
                 $root_dir,
                 $bmakelib_dir,
                 $targets_by_scope_ref,
+                $show_bmakelib,
             );
             $target_state{name}       = $next_target;
             $target_state{not_target} = $pending_not_target;
@@ -337,6 +346,7 @@ sub parse_targets_section {
                 $root_dir,
                 $bmakelib_dir,
                 $targets_by_scope_ref,
+                $show_bmakelib,
             );
         } elsif ($line =~ /^# (?:VPATH Utilities|files hash-table-stats)/) {
             process_target(
@@ -346,6 +356,7 @@ sub parse_targets_section {
                 $root_dir,
                 $bmakelib_dir,
                 $targets_by_scope_ref,
+                $show_bmakelib,
             );
             last;
         }
@@ -358,14 +369,15 @@ sub parse_targets_section {
         $root_dir,
         $bmakelib_dir,
         $targets_by_scope_ref,
+        $show_bmakelib,
     );
 }
 
 ####################################################################################################
-# parse_database(root_dir, bmakelib_dir, show_targets, show_vars, active_scopes_ref)
+# parse_database(root_dir, bmakelib_dir, show_targets, show_vars, active_scopes_ref, show_bmakelib)
 ####################################################################################################
 sub parse_database {
-    my ($root_dir, $bmakelib_dir, $show_targets, $show_vars, $active_scopes_ref) = @_;
+    my ($root_dir, $bmakelib_dir, $show_targets, $show_vars, $active_scopes_ref, $show_bmakelib) = @_;
 
     my %targets_by_scope   = (local => {}, included => {}, builtin => {});
     my %variables_by_scope = (local => {}, included => {}, builtin => {});
@@ -376,6 +388,7 @@ sub parse_database {
         $show_vars,
         $active_scopes_ref,
         \%variables_by_scope,
+        $show_bmakelib,
     );
 
     parse_targets_section(
@@ -384,6 +397,7 @@ sub parse_database {
         $show_targets,
         $active_scopes_ref,
         \%targets_by_scope,
+        $show_bmakelib,
     );
 
     return (\%targets_by_scope, \%variables_by_scope);
@@ -416,6 +430,7 @@ sub render_notes_footer {
     say "- Use 'bmakelib.conf.help.scope=local|included|builtin|all' to control the scope.";
     say "- Use 'bmakelib.conf.help.targets=no' to skip targets.";
     say "- Use 'bmakelib.conf.help.variables=no' to skip variables.";
+    say "- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.";
     say "- Use 'bmakelib.conf.help.tips=no' to silence this tip.";
 }
 
@@ -458,11 +473,12 @@ sub render_help {
 # main()
 ####################################################################################################
 sub main {
-    if (@ARGV != 5) {
-        die "Usage: help.pl <root-dir> <targets:yes|no> <variables:yes|no> <scope:all|local|included|builtin> <tips:yes|no>\n";
+    if (@ARGV < 5 || @ARGV > 6) {
+        die "Usage: help.pl <root-dir> <targets:yes|no> <variables:yes|no> <scope:all|local|included|builtin> <tips:yes|no> [show-bmakelib:yes|no]\n";
     }
 
-    my ($root_dir_raw, $show_targets_flag, $show_vars_flag, $scope_arg, $show_tips_flag) = @ARGV;
+    my ($root_dir_raw, $show_targets_flag, $show_vars_flag, $scope_arg, $show_tips_flag, $show_bmakelib_flag) = @ARGV;
+    $show_bmakelib_flag //= 'no';
 
     my $root_dir = -d $root_dir_raw ? abs_path($root_dir_raw) : abs_path(getcwd());
     $root_dir =~ s#/*$#/#;
@@ -470,9 +486,10 @@ sub main {
     my $bmakelib_dir = abs_path(dirname(__FILE__));
     $bmakelib_dir =~ s#/*$#/#;
 
-    my $show_targets = ($show_targets_flag ne 'no');
-    my $show_vars    = ($show_vars_flag ne 'no');
-    my $show_tips    = ($show_tips_flag ne 'no');
+    my $show_targets  = ($show_targets_flag ne 'no');
+    my $show_vars     = ($show_vars_flag ne 'no');
+    my $show_tips     = ($show_tips_flag ne 'no');
+    my $show_bmakelib = ($show_bmakelib_flag =~ /^(?:1|yes|true)$/i) ? 1 : 0;
 
     my %active_scopes;
     if ($scope_arg eq 'all') {
@@ -489,6 +506,7 @@ sub main {
         $show_targets,
         $show_vars,
         \%active_scopes,
+        $show_bmakelib,
     );
 
     render_help(

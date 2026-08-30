@@ -94,4 +94,16 @@ Precedence:
 
 ---
 
+# `bmakelib.conf.help.show-bmakelib`
+
+Controls whether `bmakelib.help` should display bmakelib's own targets and variables
+when imported from outside the source tree.
+
+Precedence:
+  1. `bmakelib.conf.help.show-bmakelib` (Make variable)
+  2. `BMAKELIB_CONF_HELP_SHOW_BMAKELIB` (environment variable)
+  3. `no` (default)
+
+---
+
 

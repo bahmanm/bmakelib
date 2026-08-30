@@ -48,23 +48,13 @@ make.+Entering.+
 
   VARIABLES
 (?:\s+[^\n]+\n)+
-={80}
-  INCLUDED: defined outside the source tree
-={80}
-
-  TARGETS
-    bmakelib.help  Extracts and displays available targets and variables along with their documentation.
-    help           Convenience target with a shorter and more intuitive name\..*
-
-  VARIABLES
-(?:\s+[^\n]+\n)+
-(?:={80}\n  BUILTIN: provided by GNU Make\n={80}\n\n  TARGETS\n(?:\s+[^\n]+\n)+)?
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
 - Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
 - Use 'bmakelib.conf.help.targets=no' to skip targets.
 - Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 make.+Leaving.+
 EOF
@@ -110,6 +100,7 @@ Notes:
 - Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
 - Use 'bmakelib.conf.help.targets=no' to skip targets.
 - Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 make.+Leaving.+
 EOF
@@ -152,6 +143,7 @@ Notes:
 - Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
 - Use 'bmakelib.conf.help.targets=no' to skip targets.
 - Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 make.+Leaving.+
 EOF
@@ -195,6 +187,7 @@ Notes:
 - Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
 - Use 'bmakelib.conf.help.targets=no' to skip targets.
 - Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 make.+Leaving.+
 EOF
@@ -283,6 +276,7 @@ Notes:
 - Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
 - Use 'bmakelib.conf.help.targets=no' to skip targets.
 - Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 make.+Leaving.+
 EOF
@@ -335,6 +329,60 @@ EOF
 }
 
 ####################################################################################################
+# Show bmakelib definitions: show-bmakelib=yes renders included bmakelib targets and variables.
+####################################################################################################
+
+function when_show_bmakelib_is_yes {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make bmakelib.conf.help.show-bmakelib=yes help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL: defined inside the source tree
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+  VARIABLES
+(?:\s+[^\n]+\n)+
+={80}
+  INCLUDED: defined outside the source tree
+={80}
+
+  TARGETS
+(?:\s+[^\n]+\n)+
+  VARIABLES
+(?:\s+[^\n]+\n)+
+(?:={80}\n  BUILTIN: provided by GNU Make\n={80}\n\n  TARGETS\n(?:\s+[^\n]+\n)+\n)?-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 bmakelib.test.run_test_case happy_path_default_help
 bmakelib.test.run_test_case when_scope_is_local_only
@@ -343,3 +391,5 @@ bmakelib.test.run_test_case when_variables_is_no
 bmakelib.test.run_test_case when_tips_is_no
 bmakelib.test.run_test_case when_convenience_target_is_no
 bmakelib.test.run_test_case docblock_and_inline_mixed_styles
+bmakelib.test.run_test_case when_show_bmakelib_is_yes
+

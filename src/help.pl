@@ -202,9 +202,8 @@ sub parse_variable_line {
                 my $scope = classify_scope('makefile', $var_file, $root_dir, $bmakelib_dir);
                 if ($active_scopes_ref->{$scope} && $show_vars) {
                     my $doc = extract_docstring($var_name, $var_file, $var_line);
-                    if (defined $doc) {
-                        $variables_by_scope_ref->{$scope}{$var_name} = $doc;
-                    }
+                    $doc = 'n/a' unless defined $doc && $doc ne '';
+                    $variables_by_scope_ref->{$scope}{$var_name} = $doc;
                 }
             }
         }
@@ -241,9 +240,8 @@ sub process_target {
     my $scope = $builtin ? 'builtin' : classify_scope('makefile', $file, $root_dir, $bmakelib_dir);
     if ($active_scopes_ref->{$scope} && $show_targets) {
         my $doc = extract_docstring($name, $file, $line);
-        if (defined $doc) {
-            $targets_by_scope_ref->{$scope}{$name} = $doc;
-        }
+        $doc = 'n/a' unless defined $doc && $doc ne '';
+        $targets_by_scope_ref->{$scope}{$name} = $doc;
     }
 }
 

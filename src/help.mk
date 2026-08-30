@@ -57,7 +57,7 @@ bmakelib.help :
 		HOME="$$HOME" \
 		ROOT="$(ROOT)" \
 		bmakelib.ROOT="$(bmakelib.ROOT)" \
-		$(MAKE) -p -q -n _bmakelib.help.noop \
+		$(MAKE) -p -q -n _bmakelib.help.noop 2>/dev/null \
 	| perl $(bmakelib.ROOT)help.pl \
 		"$(or $(ROOT),./)" \
 		"$(bmakelib.conf.help.targets)" \

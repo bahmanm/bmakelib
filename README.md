@@ -18,13 +18,13 @@ bmakelib is a standard library of reusable targets, recipes, and functions desig
 Just drop this bootstrap snippet directly into your `Makefile`. Zero installation and privileges required:
 
 ```makefile
-### bmakelib: download, install and include.
+###################### bmakelib: download, install and include.
 -include $(or $(BMAKELIB_DIR),$(PWD)/.bmakelib)/bmakelib.mk
 $(or $(BMAKELIB_DIR),$(PWD)/.bmakelib)/bmakelib.mk:
 	@mkdir -p $(@D)
 	@curl -fsSL https://github.com/bahmanm/bmakelib/releases/$(if $(BMAKELIB_VERSION),download/$(BMAKELIB_VERSION),latest/download)/bmakelib-portable.tar.gz \
 		| tar -xz -C $(@D) --strip-components=3
-### bmakelib: done
+###################### bmakelib: done
 
 build: bmakelib.error-if-blank( ENVIRONMENT ) ## Build application artefacts
 build:
@@ -38,31 +38,30 @@ build:
 
 ---
 
-# 2. Key Features and Showcase
+# 2. Module Catalogue
 
-### 2.1 Defensive Parameter Validation
+Detailed documentation and practical examples for each bmakelib module:
 
-Ensure mandatory build parameters and environment variables are supplied before recipes execute:
+- Self-Documentation:
+  - [`help`](doc/help.md): Automated, scope-aware help system for targets and variables.
+- Validation:
+  - [`error-if-blank`](doc/error-if-blank.md): Abort build if required variables or arguments are omitted.
+  - [`default-if-blank`](doc/default-if-blank.md): Assign sensible fallback defaults to unset variables.
+  - [`enum`](doc/enum.md): Restrict variable values to a defined set of valid options.
+- Data Structures:
+  - [`dict`](doc/dict.md): In-memory key-value maps and dictionaries within GNU Make.
+- Observability and Execution:
+  - [`timed`](doc/timed.md): High-precision benchmarking and execution timing for targets.
+  - [`logged`](doc/logged.md): Structured logging with configurable timestamps and severity levels.
+- Shell and Runtime Utilities:
+  - [`shell`](doc/shell.md): Robust subshell execution with error handling.
+  - [`bmakelib.mk`](doc/bmakelib.md): Core library orchestration, constants, and runtime version introspection.
 
-Makefile:
+---
 
-```makefile
-build: bmakelib.error-if-blank( RELEASE_STAGE )
-build:
-	@echo ✅ Deploying to $(RELEASE_STAGE)
-```
+# 3. Feature Highlight
 
-Shell output:
-
-```text
-$ make build
-*** Provide a value for 'RELEASE_STAGE'.  Stop.
-
-$ make RELEASE_STAGE=staging build
-✅ Deploying to staging
-```
-
-### 2.2 Self-Documenting Makefiles
+### 3.1 Self-Documenting Makefiles
 
 Document variables and targets inline with `##` comments and generate a clean, categorised help screen automatically:
 
@@ -100,26 +99,27 @@ Notes:
 - Use 'bmakelib.conf.help.tips=no' to silence this tip.
 ```
 
----
+### 3.2 Parameter Validation
 
-# 3. Module Catalogue
+Ensure mandatory build parameters and environment variables are supplied before recipes execute:
 
-Detailed documentation and practical examples for each bmakelib module:
+Makefile:
 
-- Self-Documentation:
-  - [`help`](doc/help.md): Automated, scope-aware help system for targets and variables.
-- Validation:
-  - [`error-if-blank`](doc/error-if-blank.md): Abort build if required variables or arguments are omitted.
-  - [`default-if-blank`](doc/default-if-blank.md): Assign sensible fallback defaults to unset variables.
-  - [`enum`](doc/enum.md): Restrict variable values to a defined set of valid options.
-- Data Structures:
-  - [`dict`](doc/dict.md): In-memory key-value maps and dictionaries within GNU Make.
-- Observability and Execution:
-  - [`timed`](doc/timed.md): High-precision benchmarking and execution timing for targets.
-  - [`logged`](doc/logged.md): Structured logging with configurable timestamps and severity levels.
-- Shell and Runtime Utilities:
-  - [`shell`](doc/shell.md): Robust subshell execution with error handling.
-  - [`bmakelib.mk`](doc/bmakelib.md): Core library orchestration, constants, and runtime version introspection.
+```makefile
+build: bmakelib.error-if-blank( RELEASE_STAGE )
+build:
+	@echo ✅ Deploying to $(RELEASE_STAGE)
+```
+
+Shell output:
+
+```text
+$ make build
+*** Provide a value for 'RELEASE_STAGE'.  Stop.
+
+$ make RELEASE_STAGE=staging build
+✅ Deploying to staging
+```
 
 ---
 

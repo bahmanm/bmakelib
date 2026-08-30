@@ -77,6 +77,7 @@ make PREFIX=${RPM_BUILD_ROOT}%{_prefix} install
 %{_prefix}/share/doc/bmakelib/shell.md
 %{_prefix}/share/doc/bmakelib/dict.md
 %{_prefix}/share/doc/bmakelib/help.md
+%{_prefix}/share/doc/bmakelib/system-wide-installation.md
 
 ####################################################################################################
 

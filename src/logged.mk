@@ -68,12 +68,29 @@
 #     * The name contains two consecutive exclamation marks (`!!`).  That is to denote that it runs a
 #       a new make process.
 #     * The log file name format is `TARGET_NAME-<time-format>.<microseconds>.logged`.
+#     * See `bmakelib.conf.logged.output-dir` to customise the output directory for logs.
 #     * See `bmakelib.conf.logged.time-format` to customise the timestamp format.
 #<
 ####################################################################################################
 
-%!!bmakelib.logged : bmakelib.error-if-blank( ROOT )
+%!!bmakelib.logged :
 	$(call bmakelib.logged._make-and-log-target,$(*))
+
+####################################################################################################
+#>
+#   # `bmakelib.conf.logged.output-dir`
+#
+#   The directory where log files are written.
+#
+#   Precedence for resolving the output directory:
+#     1. `bmakelib.conf.logged.output-dir` (Make variable)
+#     2. `BMAKELIB_CONF_LOGGED_OUTPUT_DIR` (environment variable)
+#     3. `ROOT` (legacy Make or environment variable)
+#     4. `./` (default)
+#<
+####################################################################################################
+
+bmakelib.conf.logged.output-dir ?= $(or $(BMAKELIB_CONF_LOGGED_OUTPUT_DIR),$(ROOT),./)
 
 ####################################################################################################
 #>
@@ -160,12 +177,13 @@ $(let ts,$(shell perl -MTime::HiRes=time -MPOSIX \
 		-E 'my ($$fmt) = @ARGV; $$e = time(); $$m = ($$e - int($$e)) * 1e6;' \
 		-E 'print strftime($$fmt, localtime($$e)); printf(".%06.0f", $$m)' \
 		-- "$(or $(bmakelib.conf.logged.time-format),%Y%m%d-%H%M%S)"),
-	$(let log-file,$(ROOT)$(1)-$(ts).logged,
-		$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
-			, \
-			$(info Logging target $(1) to $(log-file)))
-		$(call bmakelib.logged._logged-shell-command, \
-			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(log-file))))
+	$(let log-dir,$(patsubst %/,%,$(or $(bmakelib.conf.logged.output-dir),$(BMAKELIB_CONF_LOGGED_OUTPUT_DIR),$(ROOT),.))/,
+		$(let log-file,$(log-dir)$(1)-$(ts).logged,
+			$(if $(filter yes,$(bmakelib.conf.logged.SILENT)), \
+				, \
+				$(info Logging target $(1) to $(log-file)))
+			$(call bmakelib.logged._logged-shell-command, \
+				$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(log-file)))))
 
 endef
 

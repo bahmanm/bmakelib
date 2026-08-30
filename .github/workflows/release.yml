@@ -37,7 +37,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p artefacts
-          cp dist/bmakelib-${VERSION}-portable.tar.gz \
+          cp dist/bmakelib-portable.tar.gz \
              dist/*.rpm \
              dist/*.deb \
              artefacts/

@@ -65,8 +65,8 @@ endef
 
 ####################################################################################################
 
-$(DIST)$(NAME)-$(VERSION)-portable.tar.gz : $(DIST)
-$(DIST)$(NAME)-$(VERSION)-portable.tar.gz : build
+$(DIST)$(NAME)-portable.tar.gz : $(DIST)
+$(DIST)$(NAME)-portable.tar.gz : build
 	rm -rf $(STAGE) \
 	&& $(call _install-to,$(STAGE)$(NAME)-$(VERSION)) \
 	&& tar --create --gzip \
@@ -78,7 +78,7 @@ $(DIST)$(NAME)-$(VERSION)-portable.tar.gz : build
 
 .PHONY : package-portable
 
-package-portable : $(DIST)$(NAME)-$(VERSION)-portable.tar.gz
+package-portable : $(DIST)$(NAME)-portable.tar.gz
 
 ####################################################################################################
 

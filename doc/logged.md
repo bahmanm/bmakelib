@@ -73,6 +73,11 @@ Precedence for resolving the output directory:
 Whether to define the convenience target `%!!logged`.
 Set to 'no' *before* including bmakelib to disable.
 
+Precedence:
+  1. `bmakelib.conf.logged.convenience-target` (Make variable)
+  2. `BMAKELIB_CONF_LOGGED_CONVENIENCE_TARGET` (environment variable)
+  3. `yes` (default)
+
 ---
 
 # `!!logged`
@@ -100,11 +105,21 @@ See also `bmakelib.conf.logged.convenience-target`.
 
 If set to yes, causes `!!bmakelib.logged` to emit an info containing the log filename.
 
+Precedence:
+  1. `bmakelib.conf.logged.SILENT` (Make variable)
+  2. `BMAKELIB_CONF_LOGGED_SILENT` (environment variable)
+  3. `no` (default)
+
 ---
 
 # `bmakelib.conf.logged.ECHO_COMMAND`
 
 If set to no, causes `!!bmakelib.logged` to not echo the actual command it runs.
+
+Precedence:
+  1. `bmakelib.conf.logged.ECHO_COMMAND` (Make variable)
+  2. `BMAKELIB_CONF_LOGGED_ECHO_COMMAND` (environment variable)
+  3. `yes` (default)
 
 ---
 
@@ -112,7 +127,11 @@ If set to no, causes `!!bmakelib.logged` to not echo the actual command it runs.
 
 The `strftime`-compatible format string used for the timestamp in log filenames.
 Microseconds are always appended to avoid filename collisions.
-Default is `%Y%m%d-%H%M%S`.
+
+Precedence:
+  1. `bmakelib.conf.logged.time-format` (Make variable)
+  2. `BMAKELIB_CONF_LOGGED_TIME_FORMAT` (environment variable)
+  3. `%Y%m%d-%H%M%S` (default)
 
 ---
 

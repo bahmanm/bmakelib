@@ -51,7 +51,20 @@ $ cat some-target-20230808-16221691536940-834199518.logged
   * The name contains two consecutive exclamation marks (`!!`).  That is to denote that it runs a
     a new make process.
   * The log file name format is `TARGET_NAME-<time-format>.<microseconds>.logged`.
+  * See `bmakelib.conf.logged.output-dir` to customise the output directory for logs.
   * See `bmakelib.conf.logged.time-format` to customise the timestamp format.
+
+---
+
+# `bmakelib.conf.logged.output-dir`
+
+The directory where log files are written.
+
+Precedence for resolving the output directory:
+  1. `bmakelib.conf.logged.output-dir` (Make variable)
+  2. `BMAKELIB_CONF_LOGGED_OUTPUT_DIR` (environment variable)
+  3. `ROOT` (legacy Make or environment variable)
+  4. `./` (default)
 
 ---
 

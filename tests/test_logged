@@ -450,6 +450,331 @@ EOF
 }
 
 ####################################################################################################
+# the case when neither ROOT nor output-dir is defined (defaults to ./)
+####################################################################################################
+
+function when_no_root_or_conf_defaults_to_current_dir {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target without ROOT...
+EOF
+
+  ROOT= \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to \./some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t *.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target without ROOT...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when bmakelib.conf.logged.output-dir is customised in Makefile
+####################################################################################################
+
+function when_output_dir_is_custom_in_makefile {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  mkdir -p custom-logs
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.logged.output-dir = custom-logs/
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with custom output dir in Makefile...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to custom-logs/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t custom-logs/*.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with custom output dir in Makefile...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^custom-logs/some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when bmakelib.conf.logged.output-dir does not have a trailing slash
+####################################################################################################
+
+function when_output_dir_is_custom_without_trailing_slash {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  mkdir -p custom-logs-noslash
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+bmakelib.conf.logged.output-dir = custom-logs-noslash
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with no trailing slash in output dir...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to custom-logs-noslash/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t custom-logs-noslash/*.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with no trailing slash in output dir...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^custom-logs-noslash/some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when bmakelib.conf.logged.output-dir is customised on command line
+####################################################################################################
+
+function when_output_dir_is_custom_on_command_line {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  mkdir -p cli-logs
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with CLI output dir...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       bmakelib.conf.logged.output-dir=cli-logs/ \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to cli-logs/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t cli-logs/*.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with CLI output dir...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^cli-logs/some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when BMAKELIB_CONF_LOGGED_OUTPUT_DIR is passed as an environment variable
+####################################################################################################
+
+function when_env_var_output_dir_is_set {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  mkdir -p env-logs
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with env var output dir...
+EOF
+
+  BMAKELIB_CONF_LOGGED_OUTPUT_DIR=env-logs/ \
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to env-logs/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t env-logs/*.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with env var output dir...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^env-logs/some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
+# the case when legacy ROOT is defined as fallback
+####################################################################################################
+
+function when_root_is_defined_fallback {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_stdout_filename=${test_case_name}.actual.stdout.log
+  mkdir -p legacy-root
+  bmakelib.test.cat <<EOF > Makefile
+export ROOT := legacy-root/
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+.PHONY : some-target
+
+some-target :
+	@echo Running some-target with legacy ROOT fallback...
+EOF
+
+  make bmakelib.conf.logged.SILENT=no \
+       bmakelib.conf.logged.ECHO_COMMAND=no \
+       some-target!!logged > $actual_stdout_filename 2>&1
+
+  ### stdout
+  local expected_stdout_pattern_filename=${test_case_name}.expected.stdout.pattern
+  bmakelib.test.cat <<EOF > $expected_stdout_pattern_filename
+make.+Entering.+
+Logging target some-target to legacy-root/some-target-\d{8}-\d{6}\.\d{6}\.logged
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_stdout_filename \
+                               $expected_stdout_pattern_filename \
+    || return 1
+
+  ### logged
+  local actual_logged_filename=$(ls -t legacy-root/*.logged | head -n1)
+  local expected_logged_pattern_filename=${test_case_name}.expected.logged.pattern
+  bmakelib.test.cat <<EOF > $expected_logged_pattern_filename
+make.+Entering.+
+Running some-target with legacy ROOT fallback...
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name \
+                               $actual_logged_filename \
+                               $expected_logged_pattern_filename \
+    || return 1
+
+  [[ $actual_logged_filename =~ ^legacy-root/some-target-[0-9]{8}-[0-9]{6}\.[0-9]{6}\.logged$ ]] \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( when_silent_is_no_and_echo_command_is_yes \
                when_silent_is_no_and_echo_command_is_no \
@@ -458,7 +783,13 @@ test_cases=( when_silent_is_no_and_echo_command_is_yes \
                explicit_prerequisite \
                when_time_format_is_custom_in_makefile \
                when_time_format_is_custom_on_command_line \
-               when_time_format_is_empty_uses_default )
+               when_time_format_is_empty_uses_default \
+               when_no_root_or_conf_defaults_to_current_dir \
+               when_output_dir_is_custom_in_makefile \
+               when_output_dir_is_custom_without_trailing_slash \
+               when_output_dir_is_custom_on_command_line \
+               when_env_var_output_dir_is_set \
+               when_root_is_defined_fallback )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

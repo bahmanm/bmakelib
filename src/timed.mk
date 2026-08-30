@@ -80,10 +80,15 @@
 #
 #   Whether to define the convenience target `!timed`.
 #   Set to 'no' *before* including bmakelib to disable.
+#
+#   Precedence:
+#     1. `bmakelib.conf.timed.convenience-target` (Make variable)
+#     2. `BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET` (environment variable)
+#     3. `yes` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.timed.convenience-target ?= yes
+bmakelib.conf.timed.convenience-target ?= $(or $(BMAKELIB_CONF_TIMED_CONVENIENCE_TARGET),yes)
 
 ####################################################################################################
 #>
@@ -119,10 +124,15 @@ endif
 #    # `bmakelib.conf.timed.SILENT`
 #
 #    If set to yes, causes `!bmakelib.timed` to emit an info containing the duration of the target.
+#
+#    Precedence:
+#      1. `bmakelib.conf.timed.SILENT` (Make variable)
+#      2. `BMAKELIB_CONF_TIMED_SILENT` (environment variable)
+#      3. `no` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.timed.SILENT ?= no
+bmakelib.conf.timed.SILENT ?= $(or $(BMAKELIB_CONF_TIMED_SILENT),no)
 
 ####################################################################################################
 #   Steps to take before executing the given target

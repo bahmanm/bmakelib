@@ -13,7 +13,9 @@ bmakelib is essentially a collection of useful targets, recipes and variables yo
 
 The aim is *not* to simplify writing Makefiles but rather help you write *cleaner* and *easier to read and maintain* Makefiles.
 
-## An Example
+## Examples
+
+### Parameter Validation
 
 Makefile:
 
@@ -35,8 +37,47 @@ $ make VAR1=foo my-target
 ✅ VAR1 value is foo
 ```
 
+### Self-Documenting Makefiles
+
+Makefile:
+
+```Makefile
+include bmakelib/bmakelib.mk
+
+VAR1 ?= foo ## An optional configuration variable
+
+build : bmakelib.error-if-blank( VAR1 ) ## Compile and package all build artefacts
+build :
+	@echo ✅ VAR1 value is $(VAR1)
+```
+
+Shell:
+
+```text
+$ make help
+================================================================================
+  LOCAL: defined inside the source tree
+================================================================================
+
+  TARGETS
+    build  Compile and package all build artefacts
+
+  VARIABLES
+    VAR1   An optional configuration variable
+
+--------------------------------------------------------------------------------
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local|included|builtin|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.show-bmakelib=yes' to display bmakelib definitions.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+```
+
 # 1. Features and Options
 
+### ⭐ [`help`](doc/help.md)
 ### ⭐ [`error-if-blank`](doc/error-if-blank.md)
 ### ⭐ [`default-if-blank`](doc/default-if-blank.md)
 ### ⭐ [`enum`](doc/enum.md)

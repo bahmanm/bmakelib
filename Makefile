@@ -182,7 +182,7 @@ build : test
 build : doc-update
 build :
 	mkdir -p $(BUILD)include \
-	&& find src -type f \( -name '*.mk' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \; \
+	&& find src -type f \( -name '*.mk' -or -name '*.pl' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \; \
 	&& mkdir -p $(BUILD)doc \
 	&& cp \
 		$(ROOT)LICENSE \

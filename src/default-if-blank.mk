@@ -73,7 +73,7 @@ bmakelib.default-if-blank(%) :
 		$(subst $(bmakelib.comma), ,$(*)), \
 		$(if $($(_varname)), \
 			, \
-			$(if $(filter yes,$(bmakelib.conf.default-if-blank.SILENT)), \
+			$(if $(filter yes,$(or $(bmakelib.conf.default-if-blank.SILENT),$(BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT),yes)), \
 				, \
 				$(info Using default value '$(_varval)' for variable '$(_varname)')) \
 			$(eval override $(_varname) := $(_varval))))
@@ -85,8 +85,11 @@ bmakelib.default-if-blank(%) :
 #   Controls whether `bmakelib.default-if-blank` should emit an info message when using the default
 #   provided.
 #
-#   Default is "yes" which means do NOT emit.  Set to "no" to make it behave otherwise.
+#   Precedence:
+#     1. `bmakelib.conf.default-if-blank.SILENT` (Make variable)
+#     2. `BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT` (environment variable)
+#     3. `yes` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.default-if-blank.SILENT ?= yes
+bmakelib.conf.default-if-blank.SILENT ?= $(or $(BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT),yes)

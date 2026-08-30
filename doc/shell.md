@@ -19,7 +19,7 @@ Shell:
 
 ```text
 $ make some-target
-Makefile:4: *** bmakelib.shell.error-if-nonzero: Command exited with non-zero value 1.  Stop.
+Makefile:4: *** bmakelib.shell: Command exited with non-zero value 1.  Stop.
 ```
 
 ###  Example 2

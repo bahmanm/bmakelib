@@ -29,16 +29,16 @@ jobs:
 
       - name: Build distribution packages
         run: |
-          make package-rpm package-deb
+          make package
 
       - name: Stage release artefacts
         id: stage
         run: |
           VERSION=$(cat src/VERSION)
           mkdir -p artefacts
-          cp dist/bmakelib-${VERSION}.tar.gz \
-             dist/bmakelib-${VERSION}-*.noarch.rpm \
-             dist/bmakelib_${VERSION}-*_all.deb \
+          cp dist/bmakelib-${VERSION}-portable.tar.gz \
+             dist/*.rpm \
+             dist/*.deb \
              artefacts/
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 

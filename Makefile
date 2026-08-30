@@ -22,6 +22,7 @@ export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 URL := https://github.com/bahmanm/bmakelib
 NAME := bmakelib
 VERSION = $(file < $(ROOT)src/VERSION)
+PKG_VERSION = $(subst -,~,$(VERSION))
 BUILD := $(ROOT)_build/
 RPMBUILD := $(BUILD)rpmbuild/
 RPMSPEC := $(RPMBUILD)SPECS/bmakelib.spec
@@ -41,12 +42,12 @@ $(DIST) :
 
 ####################################################################################################
 
-$(BUILD)$(NAME)-$(VERSION).src.tar.gz : $(BUILD)
-$(BUILD)$(NAME)-$(VERSION).src.tar.gz :
+$(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz : $(BUILD)
+$(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz :
 	tar --create --gzip \
 		--file=$(@) \
 		--directory=$(ROOT) \
-		--transform='s#^\.#$(NAME)-$(VERSION)#' \
+		--transform='s#^\.#$(NAME)-$(PKG_VERSION)#' \
 		$(shell xargs -I{} echo "--exclude='{}'" < .gitignore) \
 		.
 
@@ -93,13 +94,13 @@ $(RPMBUILD) :
 
 .PHONY : package-rpm._preprocess
 
-package-rpm._preprocess : $(BUILD)$(NAME)-$(VERSION).src.tar.gz
+package-rpm._preprocess : $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz
 package-rpm._preprocess : $(RPMBUILD) $(RPMSPEC)
 package-rpm._preprocess :
-	cp $(BUILD)$(NAME)-$(VERSION).src.tar.gz $(RPMBUILD)SOURCES/$(NAME)-$(VERSION).tar.gz \
+	cp $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz $(RPMBUILD)SOURCES/$(NAME)-$(PKG_VERSION).tar.gz \
 	&& perl -pi \
-		-E 's#(Version:\s*).+#$${1}$(VERSION)#;' \
-		-E 's#(Source0:\s*).+#$${1}$(NAME)-$(VERSION).tar.gz#;' \
+		-E 's#(Version:\s*).+#$${1}$(PKG_VERSION)#;' \
+		-E 's#(Source0:\s*).+#$${1}$(NAME)-$(PKG_VERSION).tar.gz#;' \
 		$(RPMSPEC)
 
 ####################################################################################################
@@ -145,22 +146,22 @@ $(DEBBUILD) :
 
 .PHONY : package-deb._preprocess
 
-package-deb._preprocess : $(BUILD)$(NAME)-$(VERSION).src.tar.gz
+package-deb._preprocess : $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz
 package-deb._preprocess : $(DEBBUILD)
 package-deb._preprocess :
-	cp $(BUILD)$(NAME)-$(VERSION).src.tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  \
-	&& tar -C $(DEBBUILD) -xzf $(BUILD)$(NAME)-$(VERSION).src.tar.gz \
-	&& cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION) \
+	cp $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz $(DEBBUILD)$(NAME)_$(PKG_VERSION).orig.tar.gz  \
+	&& tar -C $(DEBBUILD) -xzf $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz \
+	&& cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(PKG_VERSION) \
 	&& DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
 	USER=$$(git config user.name) \
 	EMAIL=$$(git config user.email) \
 	perl -pi \
-		-E 's/%VERSION%/$(VERSION)/;' \
+		-E 's/%VERSION%/$(PKG_VERSION)/;' \
 		-E 's/%DISTRO%/unstable/;' \
 		-E 's/%GIT_USER%/$$ENV{"USER"}/;' \
 		-E 's/%GIT_EMAIL%/$$ENV{"EMAIL"}/;' \
 		-E 's/%DATE%/$$ENV{"DATE"}/' \
-		$(DEBBUILD)$(NAME)-$(VERSION)/debian/changelog
+		$(DEBBUILD)$(NAME)-$(PKG_VERSION)/debian/changelog
 
 ####################################################################################################
 
@@ -175,7 +176,7 @@ package-deb._run-debbuild-env :
 .PHONY : package-deb._build
 
 package-deb._build :
-	cd $(DEBBUILD)$(NAME)-$(VERSION) \
+	cd $(DEBBUILD)$(NAME)-$(PKG_VERSION) \
 	&& debuild \
 		--preserve-envvar=PATH \
 		--no-tgz-check \
@@ -187,10 +188,10 @@ package-deb._build :
 
 package-deb._postprocess :
 	cp \
-		$(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz \
-		$(DEBBUILD)$(NAME)_$(VERSION)-*.debian.tar.xz \
-		$(DEBBUILD)$(NAME)_$(VERSION)-*.dsc \
-		$(DEBBUILD)$(NAME)_$(VERSION)-*_all.deb \
+		$(DEBBUILD)$(NAME)_$(PKG_VERSION).orig.tar.gz \
+		$(DEBBUILD)$(NAME)_$(PKG_VERSION)-*.debian.tar.xz \
+		$(DEBBUILD)$(NAME)_$(PKG_VERSION)-*.dsc \
+		$(DEBBUILD)$(NAME)_$(PKG_VERSION)-*_all.deb \
 		$(DIST)
 
 ####################################################################################################

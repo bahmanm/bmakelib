@@ -23,6 +23,8 @@ URL := https://github.com/bahmanm/bmakelib
 NAME := bmakelib
 VERSION = $(file < $(ROOT)src/VERSION)
 PKG_VERSION = $(subst -,~,$(VERSION))
+DEB_MAINTAINER_NAME ?= $(or $(shell git config user.name 2>/dev/null),Bahman Movaqar)
+DEB_MAINTAINER_EMAIL ?= $(or $(shell git config user.email 2>/dev/null),Bahman@BahmanM.com)
 BUILD := $(ROOT)_build/
 RPMBUILD := $(BUILD)rpmbuild/
 RPMSPEC := $(RPMBUILD)SPECS/bmakelib.spec
@@ -153,13 +155,13 @@ package-deb._preprocess :
 	&& tar -C $(DEBBUILD) -xzf $(BUILD)$(NAME)-$(PKG_VERSION).src.tar.gz \
 	&& cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(PKG_VERSION) \
 	&& DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
-	USER=$$(git config user.name) \
-	EMAIL=$$(git config user.email) \
+	DEB_MAINTAINER_NAME="$(DEB_MAINTAINER_NAME)" \
+	DEB_MAINTAINER_EMAIL="$(DEB_MAINTAINER_EMAIL)" \
 	perl -pi \
 		-E 's/%VERSION%/$(PKG_VERSION)/;' \
 		-E 's/%DISTRO%/unstable/;' \
-		-E 's/%GIT_USER%/$$ENV{"USER"}/;' \
-		-E 's/%GIT_EMAIL%/$$ENV{"EMAIL"}/;' \
+		-E 's/%GIT_USER%/$$ENV{"DEB_MAINTAINER_NAME"}/;' \
+		-E 's/%GIT_EMAIL%/$$ENV{"DEB_MAINTAINER_EMAIL"}/;' \
 		-E 's/%DATE%/$$ENV{"DATE"}/' \
 		$(DEBBUILD)$(NAME)-$(PKG_VERSION)/debian/changelog
 

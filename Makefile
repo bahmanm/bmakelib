@@ -111,7 +111,7 @@ package-rpm._preprocess :
 
 package-rpm._run-rpmbuild-env :
 	docker build -t $(NAME)-rpmbuild-env - < $(ROOT)pkg/rpmbuild-env.Dockerfile \
-	&& docker run --rm -v $(ROOT):/project $(NAME)-rpmbuild-env make package-rpm._build
+	&& docker run --rm -v $(ROOT):/project $(NAME)-rpmbuild-env make package-rpm._build VERSION=$(VERSION)
 
 ####################################################################################################
 
@@ -171,7 +171,7 @@ package-deb._preprocess :
 
 package-deb._run-debbuild-env :
 	docker build -t $(NAME)-debbuild-env - < $(ROOT)pkg/debbuild-env.Dockerfile \
-	&& docker run --rm -v $(ROOT):/project $(NAME)-debbuild-env make package-deb._build
+	&& docker run --rm -v $(ROOT):/project $(NAME)-debbuild-env make package-deb._build VERSION=$(VERSION)
 
 ####################################################################################################
 

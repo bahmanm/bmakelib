@@ -74,10 +74,15 @@
 #   - `yes`, causes an `$(error)` to be raised and make to be aborted.
 #   - anything else, causes the operation to proceed.  However a `$(warning)` message will be
 #     printed.
+#
+#   Precedence:
+#     1. `bmakelib.conf.dict.error-if-blank-key` (Make variable)
+#     2. `BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY` (environment variable)
+#     3. `yes` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.dict.error-if-blank-key := yes
+bmakelib.conf.dict.error-if-blank-key ?= $(or $(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY),yes)
 
 ####################################################################################################
 #>
@@ -89,10 +94,15 @@ bmakelib.conf.dict.error-if-blank-key := yes
 #   - `yes`, causes an `$(error)` to be raised and make to be aborted.
 #   - anything else, causes the operation to proceed.  However a `$(warning)` message will be
 #     printed.
+#
+#   Precedence:
+#     1. `bmakelib.conf.dict.error-if-blank-value` (Make variable)
+#     2. `BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE` (environment variable)
+#     3. `no` (default)
 #<
 ####################################################################################################
 
-bmakelib.conf.dict.error-if-blank-value := no
+bmakelib.conf.dict.error-if-blank-value ?= $(or $(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE),no)
 
 ####################################################################################################
 #>
@@ -158,12 +168,12 @@ bmakelib.dict.define(%) :
 define bmakelib.dict.put
 $(eval\
   $(if $(2),\
-    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-key)),\
+    ,$(if $(filter yes,$(or $(bmakelib.conf.dict.error-if-blank-key),$(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY),yes)),\
        $(error bmakelib.dict: Key cannot be blank),\
        $(warning bmakelib.dict: Using blank key.))))\
 $(eval\
   $(if $(3),\
-    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-value)),\
+    ,$(if $(filter yes,$(or $(bmakelib.conf.dict.error-if-blank-value),$(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE),no)),\
        $(error bmakelib.dict: Value cannot be blank),\
        $(warning bmakelib.dict: Using blank value.))))\
 $(eval bmakelib.dict.define.__$(1).$(2) := $(3))

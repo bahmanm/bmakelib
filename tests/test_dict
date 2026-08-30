@@ -282,6 +282,136 @@ EOF
 }
 
 ####################################################################################################
+# When BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY is set to no, put should accept a blank key with warning.
+####################################################################################################
+
+function when_env_var_error_if_blank_key_is_set_to_no_warns {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,,value1)
+
+a-target :
+	@echo \$(call bmakelib.dict.get,MY-DICT,)
+EOF
+
+  BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY=no \
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\s+bmakelib.dict: Using blank key.
+value1
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# When BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE is set to yes, put should reject blank value with error.
+####################################################################################################
+
+function when_env_var_error_if_blank_value_is_set_to_yes_errors {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,key1,)
+
+a-target :
+	@:
+EOF
+
+  BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE=yes \
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+bmakelib.dict: Value cannot be blank.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Makefile variable overrides BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY environment variable.
+####################################################################################################
+
+function when_makefile_var_overrides_env_var_for_dict {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+bmakelib.conf.dict.error-if-blank-key := yes
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,,value1)
+
+a-target :
+	@:
+EOF
+
+  BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY=no \
+  make a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+bmakelib.dict: Key cannot be blank.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# CLI argument overrides BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE environment variable.
+####################################################################################################
+
+function when_cli_overrides_env_var_for_dict {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<EOF > Makefile
+SHELL := /usr/bin/env bash
+include \$(bmakelib.ROOT)/bmakelib.mk
+
+\$(call bmakelib.dict.define,MY-DICT)
+\$(call bmakelib.dict.put,MY-DICT,key1,)
+
+a-target :
+	@:
+EOF
+
+  BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE=no \
+  make bmakelib.conf.dict.error-if-blank-value=yes a-target > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<EOF > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+bmakelib.dict: Value cannot be blank.\s+Stop.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 test_cases=( happy_path_using_call
              happy_path_using_target_dependency
@@ -290,7 +420,11 @@ test_cases=( happy_path_using_call
              default_value_of_conf_dict_error_if_blank_key_is_yes
              put_should_reject_blank_value_with_error_when_conf_is_set
              put_should_accept_blank_value_with_warning_when_conf_is_set
-             default_value_of_conf_dict_error_if_blank_value_is_no )
+             default_value_of_conf_dict_error_if_blank_value_is_no
+             when_env_var_error_if_blank_key_is_set_to_no_warns
+             when_env_var_error_if_blank_value_is_set_to_yes_errors
+             when_makefile_var_overrides_env_var_for_dict
+             when_cli_overrides_env_var_for_dict )
 
 test_case_name=''	# mutated in the for loop
 test_suite_status=0	# mutated in the for loop

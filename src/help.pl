@@ -427,9 +427,9 @@ sub render_help {
 
     my @scope_order = qw(local included builtin);
     my %scope_descriptions = (
-        local    => 'defined in the source tree',
-        included => 'imported from included makefiles',
-        builtin  => 'predefined by GNU Make',
+        local    => 'defined inside the source tree',
+        included => 'defined outside the source tree',
+        builtin  => 'provided by GNU Make',
     );
     my $has_rendered_any = 0;
 

@@ -40,7 +40,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS
@@ -49,7 +49,7 @@ make.+Entering.+
   VARIABLES
 (?:\s+[^\n]+\n)+
 ={80}
-  INCLUDED: imported from included makefiles
+  INCLUDED: defined outside the source tree
 ={80}
 
   TARGETS
@@ -58,7 +58,7 @@ make.+Entering.+
 
   VARIABLES
 (?:\s+[^\n]+\n)+
-(?:={80}\n  BUILTIN: predefined by GNU Make\n={80}\n\n  TARGETS\n(?:\s+[^\n]+\n)+)?
+(?:={80}\n  BUILTIN: provided by GNU Make\n={80}\n\n  TARGETS\n(?:\s+[^\n]+\n)+)?
 -{80}
 Notes:
 - Run 'env' to view the environment variables passed to Make.
@@ -96,7 +96,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS
@@ -141,7 +141,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   VARIABLES
@@ -183,7 +183,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS
@@ -226,7 +226,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS
@@ -269,7 +269,7 @@ make.+Entering.+
 make.+Leaving.+
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS
@@ -320,7 +320,7 @@ EOF
   bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
 make.+Entering.+
 ={80}
-  LOCAL: defined in the source tree
+  LOCAL: defined inside the source tree
 ={80}
 
   TARGETS

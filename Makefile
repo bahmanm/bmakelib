@@ -21,7 +21,7 @@ SHELL := /usr/bin/env -S bash -o pipefail
 export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 URL := https://github.com/bahmanm/bmakelib
 NAME := bmakelib
-VERSION = $(file < $(ROOT)src/VERSION)
+VERSION ?= development
 PKG_VERSION = $(subst -,~,$(VERSION))
 DEB_MAINTAINER_NAME ?= $(or $(shell git config user.name 2>/dev/null),Bahman Movaqar)
 DEB_MAINTAINER_EMAIL ?= $(or $(shell git config user.email 2>/dev/null),Bahman@BahmanM.com)
@@ -220,12 +220,11 @@ build : $(BUILD)
 build : test
 build : doc-update
 build :
-	mkdir -p $(BUILD)include \
-	&& find src -type f \( -name '*.mk' -or -name '*.pl' -or -name 'VERSION' \) -exec cp {} $(BUILD)/include/ \; \
-	&& mkdir -p $(BUILD)doc \
+	mkdir -p $(BUILD)include $(BUILD)doc \
+	&& find src -type f \( -name '*.mk' -or -name '*.pl' \) -exec cp {} $(BUILD)/include/ \; \
+	&& echo "$(VERSION)" > $(BUILD)include/VERSION \
 	&& cp \
 		$(ROOT)LICENSE \
-		$(ROOT)src/VERSION \
 		$(ROOT)README.md \
 		$(ROOT)doc/*.md \
 		$(BUILD)doc

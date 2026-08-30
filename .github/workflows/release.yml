@@ -29,12 +29,13 @@ jobs:
 
       - name: Build distribution packages
         run: |
-          make package
+          VERSION="${GITHUB_REF_NAME#v}"
+          make package VERSION="${VERSION}"
 
       - name: Stage release artefacts
         id: stage
         run: |
-          VERSION=$(cat src/VERSION)
+          VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p artefacts
           cp dist/bmakelib-${VERSION}-portable.tar.gz \
              dist/*.rpm \

@@ -126,7 +126,7 @@ endif
 ####################################################################################################
 
 export bmakelib.ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export bmakelib.VERSION := $(file < $(bmakelib.ROOT)VERSION)
+export bmakelib.VERSION := $(or $(file < $(bmakelib.ROOT)VERSION),development)
 
 ####################################################################################################
 

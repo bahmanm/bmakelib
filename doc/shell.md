@@ -92,7 +92,10 @@ $ make some-target
 Controls whether `bmakelib.shell.error-if-nonzero` should emit an info message before running
 the command.
 
-Default is "yes" which means do NOT emit.  Set to "no" to make it behave otherwise.
+Precedence:
+  1. `bmakelib.conf.shell.error-if-nonzero.SILENT` (Make variable)
+  2. `BMAKELIB_CONF_SHELL_ERROR_IF_NONZERO_SILENT` (environment variable)
+  3. `yes` (default)
 
 ---
 

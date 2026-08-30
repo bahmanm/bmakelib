@@ -168,12 +168,12 @@ bmakelib.dict.define(%) :
 define bmakelib.dict.put
 $(eval\
   $(if $(2),\
-    ,$(if $(filter yes,$(or $(bmakelib.conf.dict.error-if-blank-key),$(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_KEY),yes)),\
+    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-key)),\
        $(error bmakelib.dict: Key cannot be blank),\
        $(warning bmakelib.dict: Using blank key.))))\
 $(eval\
   $(if $(3),\
-    ,$(if $(filter yes,$(or $(bmakelib.conf.dict.error-if-blank-value),$(BMAKELIB_CONF_DICT_ERROR_IF_BLANK_VALUE),no)),\
+    ,$(if $(filter yes,$(bmakelib.conf.dict.error-if-blank-value)),\
        $(error bmakelib.dict: Value cannot be blank),\
        $(warning bmakelib.dict: Using blank value.))))\
 $(eval bmakelib.dict.define.__$(1).$(2) := $(3))

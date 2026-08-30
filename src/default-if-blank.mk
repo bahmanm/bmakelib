@@ -73,7 +73,7 @@ bmakelib.default-if-blank(%) :
 		$(subst $(bmakelib.comma), ,$(*)), \
 		$(if $($(_varname)), \
 			, \
-			$(if $(filter yes,$(or $(bmakelib.conf.default-if-blank.SILENT),$(BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT),yes)), \
+			$(if $(filter yes,$(bmakelib.conf.default-if-blank.SILENT)), \
 				, \
 				$(info Using default value '$(_varval)' for variable '$(_varname)')) \
 			$(eval override $(_varname) := $(_varval))))

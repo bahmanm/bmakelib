@@ -29,7 +29,7 @@ jobs:
 
       - name: Build distribution packages
         run: |
-          make package-rpm package-deb
+          make package
 
       - name: Stage release artefacts
         id: stage

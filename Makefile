@@ -26,6 +26,7 @@ BUILD := $(ROOT)_build/
 RPMBUILD := $(BUILD)rpmbuild/
 RPMSPEC := $(RPMBUILD)SPECS/bmakelib.spec
 DEBBUILD := $(BUILD)debbuild/
+STAGE := $(BUILD)stage/
 DIST := $(ROOT)dist/
 
 ####################################################################################################
@@ -40,14 +41,41 @@ $(DIST) :
 
 ####################################################################################################
 
-$(DIST)$(NAME)-$(VERSION).tar.gz : $(DIST)
-$(DIST)$(NAME)-$(VERSION).tar.gz :
+$(BUILD)$(NAME)-$(VERSION).src.tar.gz : $(BUILD)
+$(BUILD)$(NAME)-$(VERSION).src.tar.gz :
 	tar --create --gzip \
 		--file=$(@) \
 		--directory=$(ROOT) \
 		--transform='s#^\.#$(NAME)-$(VERSION)#' \
 		$(shell xargs -I{} echo "--exclude='{}'" < .gitignore) \
 		.
+
+####################################################################################################
+
+define _install-to
+	install -m u=rwx,g=rx,o=rx -d $(1)/include/$(NAME) \
+	&& install -m u=rwx,g=rx,o=rx -d $(1)/share/doc/$(NAME) \
+	&& find $(BUILD)include -type f -exec install -m u=rw,g=r,o=r {} $(1)/include/$(NAME) \; \
+	&& install -m u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(1)/share/doc/$(NAME) \
+	&& find $(BUILD)doc -type f -name '*.md' -exec install -m u=rw,g=r,o=r {} $(1)/share/doc/$(NAME) \;
+endef
+
+####################################################################################################
+
+$(DIST)$(NAME)-$(VERSION).tar.gz : $(DIST)
+$(DIST)$(NAME)-$(VERSION).tar.gz : build
+	rm -rf $(STAGE) \
+	&& $(call _install-to,$(STAGE)$(NAME)-$(VERSION)) \
+	&& tar --create --gzip \
+		--file=$(@) \
+		--directory=$(STAGE) \
+		$(NAME)-$(VERSION)
+
+####################################################################################################
+
+.PHONY : package-tar
+
+package-tar : $(DIST)$(NAME)-$(VERSION).tar.gz
 
 ####################################################################################################
 
@@ -65,10 +93,10 @@ $(RPMBUILD) :
 
 .PHONY : package-rpm._preprocess
 
-package-rpm._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
+package-rpm._preprocess : $(BUILD)$(NAME)-$(VERSION).src.tar.gz
 package-rpm._preprocess : $(RPMBUILD) $(RPMSPEC)
 package-rpm._preprocess :
-	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(RPMBUILD)SOURCES \
+	cp $(BUILD)$(NAME)-$(VERSION).src.tar.gz $(RPMBUILD)SOURCES/$(NAME)-$(VERSION).tar.gz \
 	&& perl -pi \
 		-E 's#(Version:\s*).+#$${1}$(VERSION)#;' \
 		-E 's#(Source0:\s*).+#$${1}$(NAME)-$(VERSION).tar.gz#;' \
@@ -117,11 +145,11 @@ $(DEBBUILD) :
 
 .PHONY : package-deb._preprocess
 
-package-deb._preprocess : $(DIST)$(NAME)-$(VERSION).tar.gz
+package-deb._preprocess : $(BUILD)$(NAME)-$(VERSION).src.tar.gz
 package-deb._preprocess : $(DEBBUILD)
 package-deb._preprocess :
-	cp $(DIST)$(NAME)-$(VERSION).tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  \
-	&& tar -C $(DEBBUILD) -xzf $(DIST)$(NAME)-$(VERSION).tar.gz \
+	cp $(BUILD)$(NAME)-$(VERSION).src.tar.gz $(DEBBUILD)$(NAME)_$(VERSION).orig.tar.gz  \
+	&& tar -C $(DEBBUILD) -xzf $(BUILD)$(NAME)-$(VERSION).src.tar.gz \
 	&& cp -r $(ROOT)pkg/debian $(DEBBUILD)$(NAME)-$(VERSION) \
 	&& DATE=$$(date +'%a, %d %b %Y %H:%M:%S %z') \
 	USER=$$(git config user.name) \
@@ -155,7 +183,7 @@ package-deb._build :
 
 ####################################################################################################
 
-.PHONY : pakacge-dev._postprocess
+.PHONY : package-deb._postprocess
 
 package-deb._postprocess :
 	cp \
@@ -172,6 +200,14 @@ package-deb._postprocess :
 package-deb : package-deb._preprocess
 package-deb : package-deb._run-debbuild-env
 package-deb : package-deb._postprocess
+
+####################################################################################################
+
+.PHONY : package
+
+package : package-tar
+package : package-rpm
+package : package-deb
 
 ####################################################################################################
 
@@ -199,11 +235,7 @@ PREFIX ?= $(DESTDIR)/usr
 
 install : build
 install :
-	install -m u=rwx,g=rx,o=rx -d $(PREFIX)/include/$(NAME) \
-	&& install -m u=rwx,g=rx,o=rx -d $(PREFIX)/share/doc/$(NAME) \
-	&& find $(BUILD)include -type f -exec install -m u=rw,g=r,o=r {} $(PREFIX)/include/$(NAME) \; \
-	&& install -m u=rw,g=r,o=r $(BUILD)include/VERSION $(BUILD)doc/LICENSE $(PREFIX)/share/doc/$(NAME) \
-	&& find $(BUILD)doc -type f -name '*.md' -exec install -m u=rw,g=r,o=r {} $(PREFIX)/share/doc/$(NAME) \;
+	$(call _install-to,$(PREFIX))
 
 ####################################################################################################
 

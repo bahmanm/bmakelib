@@ -1,0 +1,349 @@
+#!/usr/bin/env bash
+#
+# Copyright © Bahman Movaqar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+####################################################################################################
+
+source $RUNNER_ROOT/tests/lib.sh
+
+####################################################################################################
+# Happy path: default help target displays targets, variables, and tips across all scopes.
+####################################################################################################
+
+function happy_path_default_help {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+  VARIABLES
+    MY_VAR  A sample configuration variable
+
+={80}
+  INCLUDED
+={80}
+
+  TARGETS
+    bmakelib.help  Extracts and displays available targets and variables along with their documentation.
+    help           Convenience target with a shorter and more intuitive name\..*
+
+  VARIABLES
+(?:\s+bmakelib\.[^\n]+\n)+
+-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Scope filtering: scope=local renders only local targets and variables.
+####################################################################################################
+
+function when_scope_is_local_only {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make bmakelib.conf.help.scope=local help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+  VARIABLES
+    MY_VAR  A sample configuration variable
+
+-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Target filtering: targets=no suppresses target subsections.
+####################################################################################################
+
+function when_targets_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make bmakelib.conf.help.scope=local bmakelib.conf.help.targets=no help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  VARIABLES
+    MY_VAR  A sample configuration variable
+
+-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Variable filtering: variables=no suppresses variable subsections.
+####################################################################################################
+
+function when_variables_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make bmakelib.conf.help.scope=local bmakelib.conf.help.variables=no help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Tips filtering: tips=no suppresses the notes/tips footer block.
+####################################################################################################
+
+function when_tips_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make bmakelib.conf.help.scope=local bmakelib.conf.help.tips=no help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+  VARIABLES
+    MY_VAR  A sample configuration variable
+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Convenience target configuration: convenience-target=no prevents defining 'help'.
+####################################################################################################
+
+function when_convenience_target_is_no {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+bmakelib.conf.help.convenience-target := no
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val ## A sample configuration variable
+
+my-target : ## Build a sample target
+	@echo "running my-target"
+EOF
+
+  make help > $actual_value_filename 2>&1
+  make bmakelib.conf.help.scope=local bmakelib.help >> $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+.+\*\*\*\s+No rule to make target 'help'\.\s+Stop\.
+make.+Leaving.+
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    my-target  Build a sample target
+
+  VARIABLES
+    MY_VAR  A sample configuration variable
+
+-{80}
+Notes:
+- Run 'env' to view the environment variables passed to Make.
+- Use 'bmakelib.conf.help.scope=local\|included\|builtin\|all' to control the scope.
+- Use 'bmakelib.conf.help.targets=no' to skip targets.
+- Use 'bmakelib.conf.help.variables=no' to skip variables.
+- Use 'bmakelib.conf.help.tips=no' to silence this tip.
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+# Mixed documentation styles: bmakelib docblocks and inline ## comments.
+####################################################################################################
+
+function docblock_and_inline_mixed_styles {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+#>
+#   # `block-target`
+#
+#   Target documented using structured bmakelib docblock.
+#<
+block-target :
+	@echo "block target"
+
+inline-target : ## Target documented using inline double-hash.
+	@echo "inline target"
+EOF
+
+  make bmakelib.conf.help.scope=local bmakelib.conf.help.variables=no bmakelib.conf.help.tips=no help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL
+={80}
+
+  TARGETS
+    block-target   Target documented using structured bmakelib docblock\.
+    inline-target  Target documented using inline double-hash\.
+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
+
+bmakelib.test.run_test_case happy_path_default_help
+bmakelib.test.run_test_case when_scope_is_local_only
+bmakelib.test.run_test_case when_targets_is_no
+bmakelib.test.run_test_case when_variables_is_no
+bmakelib.test.run_test_case when_tips_is_no
+bmakelib.test.run_test_case when_convenience_target_is_no
+bmakelib.test.run_test_case docblock_and_inline_mixed_styles

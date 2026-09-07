@@ -383,6 +383,46 @@ EOF
 }
 
 ####################################################################################################
+# Issue #142: Non-targets with special characters (e.g. error-if-blank parentheses) do not suppress subsequent targets.
+####################################################################################################
+
+function when_target_prerequisite_has_special_characters {
+  local test_case_name=${FUNCNAME[0]}
+  local actual_value_filename=${test_case_name}.actual.log
+  bmakelib.test.cat <<'EOF' > Makefile
+SHELL := /usr/bin/env bash
+include $(bmakelib.ROOT)/bmakelib.mk
+
+MY_VAR ?= test-val
+
+libscid.configure : bmakelib.error-if-blank( MY_VAR ) ## Configure libscid build
+	@echo "configuring"
+
+libscid.build : ## Build libscid
+	@echo "building"
+EOF
+
+  make bmakelib.conf.help.scope=local bmakelib.conf.help.variables=no bmakelib.conf.help.tips=no help > $actual_value_filename 2>&1
+
+  local expexted_pattern_filename=${test_case_name}.expected.pattern
+  bmakelib.test.cat <<'EOF' > $expexted_pattern_filename
+make.+Entering.+
+={80}
+  LOCAL: defined inside the source tree
+={80}
+
+  TARGETS
+    libscid\.build\s+Build libscid
+    libscid\.configure\s+Configure libscid build
+
+make.+Leaving.+
+EOF
+
+  bmakelib.test.assert_matches $test_case_name $actual_value_filename $expexted_pattern_filename \
+    || return 1
+}
+
+####################################################################################################
 
 bmakelib.test.run_test_case happy_path_default_help
 bmakelib.test.run_test_case when_scope_is_local_only
@@ -392,4 +432,6 @@ bmakelib.test.run_test_case when_tips_is_no
 bmakelib.test.run_test_case when_convenience_target_is_no
 bmakelib.test.run_test_case docblock_and_inline_mixed_styles
 bmakelib.test.run_test_case when_show_bmakelib_is_yes
+bmakelib.test.run_test_case when_target_prerequisite_has_special_characters
+
 

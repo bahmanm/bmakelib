@@ -324,7 +324,7 @@ sub parse_targets_section {
             get_file_lines($target_state{file});
         } elsif ($line =~ /^#\s+(?:Builtin rule|recipe to execute \(built-in\))/) {
             $target_state{builtin} = 1;
-        } elsif ($line =~ /^([a-zA-Z0-9_.-]+)\s*:(?!=)/) {
+        } elsif ($line =~ /^([a-zA-Z0-9_().-]+)\s*:(?!=)/) {
             my $next_target = $1;
             process_target(
                 \%target_state,
@@ -348,7 +348,8 @@ sub parse_targets_section {
                 $targets_by_scope_ref,
                 $show_bmakelib,
             );
-        } elsif ($line =~ /^# (?:VPATH Utilities|files hash-table-stats)/) {
+            $pending_not_target = 0;
+        } elsif ($line =~ /^# (?:VPATH Utilities|files hash-table[ -]stats)/) {
             process_target(
                 \%target_state,
                 $active_scopes_ref,

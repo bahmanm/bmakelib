@@ -142,7 +142,7 @@ make -v
 If your operating system provides an older Make version, upgrading is straightforward:
 
 ```bash
-wget https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz
+wget https://mirrors.kernel.org/gnu/make/make-4.4.1.tar.gz
 tar xzf make-4.4.1.tar.gz
 cd make-4.4.1
 ./configure --prefix=/usr/local

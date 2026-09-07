@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_dict.mk
+__bmakelib_dict.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.dict`
@@ -217,3 +220,5 @@ bmakelib.dict.put(%) :
 define bmakelib.dict.get
 $(bmakelib.dict.define.__$(1).$(2))
 endef
+
+endif # __bmakelib_dict.mk

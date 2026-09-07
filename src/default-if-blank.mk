@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_default-if-blank.mk
+__bmakelib_default-if-blank.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.default-if-blank`
@@ -93,3 +96,5 @@ bmakelib.default-if-blank(%) :
 ####################################################################################################
 
 bmakelib.conf.default-if-blank.SILENT ?= $(or $(BMAKELIB_CONF_DEFAULT_IF_BLANK_SILENT),yes)
+
+endif # __bmakelib_default-if-blank.mk

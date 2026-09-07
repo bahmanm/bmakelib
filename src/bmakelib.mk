@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_bmakelib.mk
+__bmakelib_bmakelib.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.MIN_MAKE_VERSION`
@@ -135,3 +138,5 @@ bmakelib.FEATURES := error-if-blank.mk default-if-blank.mk timed.mk logged.mk en
 .PHONY : $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
 
 include $(bmakelib.FEATURES:%=$(bmakelib.ROOT)%)
+
+endif # __bmakelib_bmakelib.mk

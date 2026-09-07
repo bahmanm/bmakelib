@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_error-if-blank.mk
+__bmakelib_error-if-blank.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.error-if-blank`
@@ -42,3 +45,5 @@ bmakelib.error-if-blank(%) :
 	$(if $($(*)), \
 		, \
 		$(error Provide a value for '$(*)'))
+
+endif # __bmakelib_error-if-blank.mk

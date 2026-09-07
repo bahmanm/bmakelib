@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_timed.mk
+__bmakelib_timed.mk := 1
+
 ####################################################################################################
 #>
 #   # `!bmakelib.timed`
@@ -161,3 +164,5 @@ bmakelib._%!timed-post :
 bmakelib._%!timed : bmakelib._%!timed-pre .WAIT % .WAIT bmakelib._%!timed-post
 	$(eval bmakelib.vars.timed.duration.$(*) := \
 		$(shell perl -E 'printf("%.0f", ($(bmakelib.vars.timed.end-ts.$(*)) - $(bmakelib.vars.timed.begin-ts.$(*))) / 1_000_000)'))
+
+endif # __bmakelib_timed.mk

@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_shell.mk
+__bmakelib_shell.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.shell.error-if-nonzero`
@@ -123,3 +126,5 @@ endef
 ####################################################################################################
 
 bmakelib.conf.shell.error-if-nonzero.SILENT ?= $(or $(BMAKELIB_CONF_SHELL_ERROR_IF_NONZERO_SILENT),yes)
+
+endif # __bmakelib_shell.mk

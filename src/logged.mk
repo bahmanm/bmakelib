@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_logged.mk
+__bmakelib_logged.mk := 1
+
 ####################################################################################################
 #>
 #   # `!!bmakelib.logged`
@@ -223,3 +226,6 @@ $(if $(filter yes,$(bmakelib.conf.logged.ECHO_COMMAND)),,@)exec 3>&1 4>&2 $(bmak
 && $(1)
 
 endef
+
+endif # __bmakelib_logged.mk
+

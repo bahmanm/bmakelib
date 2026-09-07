@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_help.mk
+__bmakelib_help.mk := 1
+
 .PHONY : _bmakelib.help.noop
 
 _bmakelib.help.noop :
@@ -177,3 +180,5 @@ bmakelib.conf.help.tips ?= $(or $(BMAKELIB_CONF_HELP_TIPS),yes)
 ####################################################################################################
 
 bmakelib.conf.help.show-bmakelib ?= $(or $(BMAKELIB_CONF_HELP_SHOW_BMAKELIB),no)
+
+endif # __bmakelib_help.mk

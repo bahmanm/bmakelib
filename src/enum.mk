@@ -13,6 +13,9 @@
 # limitations under the License.
 ####################################################################################################
 
+ifndef __bmakelib_enum.mk
+__bmakelib_enum.mk := 1
+
 ####################################################################################################
 #>
 #   # `bmakelib.enum.define`
@@ -162,3 +165,5 @@ $(eval \
 		,\
 		$(error '$($(2))' is not a member of enum '$(1)')))
 endef
+
+endif # __bmakelib_enum.mk

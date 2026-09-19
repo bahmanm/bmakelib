@@ -21,15 +21,15 @@ Pre-built binary packages are published on each [GitHub Release](https://github.
 ### 2.1 Debian / Ubuntu
 
 ```bash
-wget https://github.com/bahmanm/bmakelib/releases/download/v0.8.0/bmakelib_0.8.0-1_all.deb
-sudo dpkg -i bmakelib_0.8.0-1_all.deb
+wget https://github.com/bahmanm/bmakelib/releases/download/v0.9.1/bmakelib_0.9.1-1_all.deb
+sudo dpkg -i bmakelib_0.9.1-1_all.deb
 ```
 
 ### 2.2 RHEL / Fedora / CentOS
 
 ```bash
-wget https://github.com/bahmanm/bmakelib/releases/download/v0.8.0/bmakelib-0.8.0-1.1.noarch.rpm
-sudo rpm -i bmakelib-0.8.0-1.1.noarch.rpm
+wget https://github.com/bahmanm/bmakelib/releases/download/v0.9.1/bmakelib-0.9.1-1.1.noarch.rpm
+sudo rpm -i bmakelib-0.9.1-1.1.noarch.rpm
 ```
 
 ---

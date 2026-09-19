@@ -1,5 +1,6 @@
 # bmakelib 
 [![CI](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmanm/bmakelib/actions/workflows/ci.yml/badge.svg?branch=main)
+[![Documentation](https://img.shields.io/badge/docs-bmakelib.bahmanm.com-007ec6.svg)](https://bmakelib.bahmanm.com/)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bahmanm/bmakelib/total?style=flat&logo=github&logoColor=white&color=0e80c0)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bdockerimg/bmakelib?style=flat&logo=docker&logoColor=white&label=pulls&color=%230e80c0)](https://hub.docker.com/r/bdockerimg/bmakelib)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/bahmanm/bmakelib?style=flat&logo=github&label=commits)
@@ -7,7 +8,9 @@
 
 The minimalist Make standard library you'd always wished for!
 
-<img alt="bmakelib logo" src="https://imgur.com/lt9nwW3.png" style="height: 200px; width: 200px; vertical-align: top" />
+> Complete documentation, interactive guides, and module recipes are published at [bmakelib.bahmanm.com](https://bmakelib.bahmanm.com/).
+
+<img alt="bmakelib logo" src="doc/assets/img/logo.png" style="height: 165px; width: 139px; vertical-align: top" />
 
 bmakelib is a standard library of reusable targets, recipes, and functions designed to help you write cleaner, safer, and self-documenting Makefiles.
 

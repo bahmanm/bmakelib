@@ -47,3 +47,8 @@ jobs:
         run: |
           export TMPDIR=$(mktemp -d)
           make PREFIX="${TMPDIR}/" test install
+
+      - name: Assert documentation parity
+        run: |
+          make doc-update
+          git diff --exit-code doc/

@@ -1,0 +1,91 @@
+name: pages
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "doc/**"
+      - "mkdocs.yml"
+      - "src/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  pages__build:
+    name: Build documentation site
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -euo pipefail {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install documentation dependencies
+        run: pip install -r doc/requirements.txt
+
+      - name: Update documentation from source
+        run: make doc-update
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Build MkDocs documentation
+        run: mkdocs build --strict --site-dir _site
+
+      - name: Assemble site artifact
+        run: |
+          cp doc/CNAME _site/CNAME
+
+      - name: Verify site build
+        run: |
+          for file in \
+            _site/index.html \
+            _site/CNAME \
+            _site/assets/img/logo.png \
+            _site/bmakelib/index.html \
+            _site/help/index.html \
+            _site/dict/index.html \
+            _site/system-wide-installation/index.html; do
+            if [[ ! -f "$file" ]]; then
+              echo "ERROR: Missing required artifact: $file" >&2
+              exit 1
+            fi
+            echo "Verified artifact: $file"
+          done
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  pages__deploy:
+    name: Deploy to GitHub Pages
+    needs: pages__build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

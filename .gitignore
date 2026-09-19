@@ -3,6 +3,7 @@
 
 dist
 _build
+_site
 
 # debhelper
 generated

@@ -1,0 +1,90 @@
+site_name: bmakelib
+site_description: The minimalist Make standard library you'd always wished for!
+site_url: https://bmakelib.bahmanm.com/
+repo_name: bahmanm/bmakelib
+repo_url: https://github.com/bahmanm/bmakelib
+docs_dir: doc
+site_dir: _site
+
+theme:
+  name: material
+  logo: assets/img/logo.png
+  favicon: assets/img/logo.png
+  font:
+    text: Cantarell
+    code: Oxygen Mono
+  palette:
+    - scheme: solarized-light
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: solarized-dark
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - toc.integrate
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - tables
+  - attr_list
+
+extra_css:
+  - stylesheets/solarized.css
+
+exclude_docs: |
+  update
+
+validation:
+  nav:
+    omitted_files: info
+    not_found: warn
+    absolute_links: info
+  links:
+    not_found: warn
+    absolute_links: info
+    unrecognized_links: info
+
+nav:
+  - Overview: index.md
+  - Modules:
+      - Core:
+          - bmakelib: bmakelib.md
+          - help: help.md
+      - Validation:
+          - error-if-blank: error-if-blank.md
+          - default-if-blank: default-if-blank.md
+          - enum: enum.md
+      - Data Structures:
+          - dict: dict.md
+      - Observability:
+          - timed: timed.md
+          - logged: logged.md
+      - System & Runtime:
+          - shell: shell.md
+  - Installation:
+      - System-Wide Installation: system-wide-installation.md

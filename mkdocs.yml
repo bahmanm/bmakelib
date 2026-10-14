@@ -59,6 +59,11 @@ extra_css:
 exclude_docs: |
   update
 
+extra:
+  analytics:
+    provider: google
+    property: G-7D48WQHGZH
+
 validation:
   nav:
     omitted_files: info
